@@ -22,7 +22,6 @@ jobs:
           - ws:type-check
           - ws:lint:fix
           - ws:test:browser
-          - ws:test:cov
           - codemod:full
 
     steps:
@@ -79,7 +78,3 @@ jobs:
 
       - name: Check if there is no file diff
         run: pnpm exec assert-repo-is-clean
-
-      - name: Upload coverage reports to Codecov
-        if: matrix.command == 'ws:test:cov'
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
