@@ -58,6 +58,12 @@ const checkAll = async (): Promise<void> => {
   });
 
   await logStep({
+    startMessage: 'Running codemod',
+    action: () => runCmdStep('pnpm run codemod:full', 'Codemod failed'),
+    successMessage: 'Codemod applied',
+  });
+
+  await logStep({
     startMessage: 'Formatting code',
     action: () => runCmdStep('pnpm run fmt', 'File formatting failed'),
     successMessage: 'Code formatted',
