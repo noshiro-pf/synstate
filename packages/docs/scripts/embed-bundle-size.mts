@@ -19,12 +19,12 @@ const targetMarkdownFiles: readonly string[] = [
     'src/content/docs/getting-started/introduction.md',
   ),
   path.resolve(workspaceRootPath, 'src/content/docs/index.mdx'),
-];
+] as const;
 
 const measureBundleSize = async (
   entryPoint: string,
   externals: readonly string[],
-): Promise<{ minifiedBytes: number; gzippedBytes: number }> => {
+): Promise<Readonly<{ minifiedBytes: number; gzippedBytes: number }>> => {
   const res = await build({
     entryPoints: [entryPoint],
     bundle: true,
