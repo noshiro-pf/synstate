@@ -129,7 +129,7 @@ assert.deepStrictEqual(result, [0, 1000, 1001, 2001, 2002, 3002, 3003]);
 
 The following diagram illustrates how the glitch occurs in RxJS's `combineLatest`:
 
-<iframe src="/synstate/rxjs-glitch-diagram.pdf" width="100%" height="600px" style="border: none;"></iframe>
+<iframe src="/synstate/rxjs-glitch-diagram.pdf#toolbar=0" width="100%" style="aspect-ratio: 16 / 9; style="border: none;"></iframe>
 
 ## What Happens in MobX (Glitch-Free)
 
