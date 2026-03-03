@@ -19,6 +19,7 @@ const targetMarkdownFiles: readonly string[] = [
     'src/content/docs/getting-started/introduction.md',
   ),
   path.resolve(workspaceRootPath, 'src/content/docs/index.mdx'),
+  path.resolve(workspaceRootPath, '../synstate/README.md'),
 ] as const;
 
 const measureBundleSize = async (

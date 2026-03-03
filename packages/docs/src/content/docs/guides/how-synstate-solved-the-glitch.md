@@ -125,6 +125,12 @@ assert.deepStrictEqual(result, [0, 1000, 1001, 2001, 2002, 3002, 3003]);
 |    6 |                   3 |                3000 |                     **3002** ✗ |   Glitch    |
 |    7 |                   3 |                3000 |                     **3003** ✓ |     Yes     |
 
+### Diagram
+
+The following diagram illustrates how the glitch occurs in RxJS's `combineLatest`:
+
+<iframe src="/synstate/rxjs-glitch-diagram.pdf" width="100%" height="600px" style="border: none;"></iframe>
+
 ## What Happens in MobX (Glitch-Free)
 
 MobX takes a fundamentally different approach from RxJS. While RxJS is push-based (values are eagerly propagated to subscribers as soon as they change), MobX's `computed` values are **pull-based and lazily evaluated** — they are only recomputed when accessed.
