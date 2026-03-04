@@ -105,6 +105,5 @@ For more details, see [React Integration](/synstate/guides/react-integration/).
 ## Next Steps
 
 - [Installation](/synstate/getting-started/installation/) — Install SynState and optional companion packages
-- [Quick Start](/synstate/getting-started/quick-start/) — Create your first reactive state
 - [Why SynState?](/synstate/guides/why-synstate/) — Learn about the design philosophy and use cases
 - [React Integration](/synstate/guides/react-integration/) — Use SynState with React
