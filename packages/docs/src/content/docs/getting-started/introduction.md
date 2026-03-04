@@ -83,7 +83,12 @@ Here is how these methods relate to each other:
 For example:
 
 ```tsx
-import { combine, createState, InitializedObservable, map } from 'synstate';
+import {
+    combine,
+    createState,
+    type InitializedObservable,
+    map,
+} from 'synstate';
 
 const [count, setCount] = createState<number>(0);
 
