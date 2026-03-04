@@ -48,7 +48,64 @@ setState(1);
 
 `createState` creates a reactive state and a setter function. Subscribers are notified immediately with the initial value, and again whenever the state is updated.
 
-Although `createState` looks similar to React's `useState`, it is fundamentally different. The first element of the return value is an `InitializedObservable<T>` — a specialized Observable provided by SynState that always holds an initial value — not a plain value. `createState` does not work correctly inside React components (which are re-evaluated on every render) and must be called at the global scope.
+### What is an Observable?
+
+In SynState, an **Observable** is a reactive value container that notifies subscribers whenever its value changes. Unlike a plain variable, an Observable allows you to _react_ to state changes declaratively.
+
+The three main methods you'll use are:
+
+| Method | Description |
+|---|---|
+| `getSnapshot()` | Synchronously read the current value |
+| `subscribe(fn)` | Register a callback that runs on every value change |
+| `pipe(operator)` | Transform the Observable into a new Observable |
+
+Here is how these methods relate to each other:
+
+```
+                          pipe(map(x => x * 2))
+                        ┌───────────────────────┐
+                        │                       ▼
+┌─────────────────┐     │     ┌─────────────────────────┐
+│  state (Observable)  │──┤     │  derived (Observable)      │
+│  value: 1       │     │     │  value: 2               │
+└────┬────────────┘     │     └────┬────────────────────┘
+     │                  │          │
+     │ getSnapshot()    │          │ subscribe(fn)
+     │   → 1            │          │   → fn(2) is called
+     │                  │          │     on every change
+     │ subscribe(fn)    │          │
+     │   → fn(1)        │          │ getSnapshot()
+     │                  │          │   → 2
+     └──────────────────┘          └────────────────────────
+```
+
+For example:
+
+```ts
+import { createState, map } from 'synstate';
+
+const [count, setCount] = createState(0);
+
+// Read the current value
+console.log(count.getSnapshot()); // 0
+
+// Derive a new Observable using pipe
+const doubled = count.pipe(map((n) => n * 2));
+
+// Subscribe to changes
+doubled.subscribe((value) => {
+    console.log('doubled:', value); // "doubled: 0", then "doubled: 2"
+});
+
+setCount(1);
+```
+
+Although `createState` looks similar to React's `useState`, it is fundamentally different. The first element of the return value is an `InitializedObservable<T>` — a specialized Observable provided by SynState that always holds an initial value — not a plain value.
+
+### `createState` does not work correctly inside React components
+
+`createState` does not work correctly inside React components (which are re-evaluated on every render) and must be called at the global scope.
 
 ```ts
 import type * as React from 'react';
