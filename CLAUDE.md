@@ -6,11 +6,11 @@ SynState is a lightweight, type-safe state management library for TypeScript/Jav
 
 This is a **pnpm monorepo** with three packages:
 
-| Package | Path | Description |
-|---------|------|-------------|
-| `synstate` | `packages/synstate` | Core library — observables, operators, combinators, state/reducer/emitter utilities |
-| `synstate-react-hooks` | `packages/synstate-react-hooks` | React hooks integration (`useObservableValue`, `useObservableEffect`, etc.) |
-| `synstate-preact-hooks` | `packages/synstate-preact-hooks` | Preact hooks integration (same API as React hooks) |
+| Package                 | Path                             | Description                                                                         |
+| ----------------------- | -------------------------------- | ----------------------------------------------------------------------------------- |
+| `synstate`              | `packages/synstate`              | Core library — observables, operators, combinators, state/reducer/emitter utilities |
+| `synstate-react-hooks`  | `packages/synstate-react-hooks`  | React hooks integration (`useObservableValue`, `useObservableEffect`, etc.)         |
+| `synstate-preact-hooks` | `packages/synstate-preact-hooks` | Preact hooks integration (same API as React hooks)                                  |
 
 ## Quick Reference
 
@@ -64,7 +64,7 @@ pnpm run gi               # Regenerate index.mts barrel files
 
 ### Core Package (`packages/synstate`)
 
-```
+```text
 src/
 ├── core/
 │   ├── class/           # Observable class hierarchy (RootObservable, ChildObservable)
@@ -85,6 +85,7 @@ src/
 ### Framework Hooks Packages
 
 Both `synstate-react-hooks` and `synstate-preact-hooks` share the same API surface:
+
 - `useObservableValue` — subscribe to an observable and get its current value as React/Preact state
 - `useObservableEffect` — run side effects when observable values change
 - `useValueAsObservable` — convert a React/Preact value into an observable
@@ -130,7 +131,7 @@ Both `synstate-react-hooks` and `synstate-preact-hooks` share the same API surfa
 ### Git Conventions
 
 - **Commit messages**: Conventional Commits format — `type: description`
-  - Types: `feat`, `fix`, `chore`, `ci`, `docs`, `refactor`, `test`
+    - Types: `feat`, `fix`, `chore`, `ci`, `docs`, `refactor`, `test`
 - **Changesets**: Use `@changesets/cli` for versioning. Add changesets for user-facing changes via `pnpm changeset`
 - **Branch protection**: `main` branch is protected; PRs required
 - **Base branch**: `main`
@@ -143,14 +144,14 @@ Index files (`index.mts`) are auto-generated. Run `pnpm run gi` in a package to 
 
 GitHub Actions workflows:
 
-| Workflow | Trigger | What it does |
-|----------|---------|--------------|
-| **Style Check** | Push (non-develop) | Runs: `fmt:full`, `md`, `cspell`, `ws:doc`, `ws:check:ext` |
-| **Type Check** | Push (non-develop) | Runs: `check:root`, `ws:type-check`, `ws:lint:fix`, `ws:test:all`, `ws:test:browser`, `ws:test:cov`, `codemod:full` |
-| **Release** | Push to `main` | Changesets: creates version PR or publishes to npm |
-| **Lint PR** | PR events | Validates PR title format |
-| **Auto Merge** | PR events | Auto-merges Dependabot PRs |
-| **Node Compat** | Push | Tests across Node.js versions |
+| Workflow        | Trigger            | What it does                                                                                                        |
+| --------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| **Style Check** | Push (non-develop) | Runs: `fmt:full`, `md`, `cspell`, `ws:doc`, `ws:check:ext`                                                          |
+| **Type Check**  | Push (non-develop) | Runs: `check:root`, `ws:type-check`, `ws:lint:fix`, `ws:test:all`, `ws:test:browser`, `ws:test:cov`, `codemod:full` |
+| **Release**     | Push to `main`     | Changesets: creates version PR or publishes to npm                                                                  |
+| **Lint PR**     | PR events          | Validates PR title format                                                                                           |
+| **Auto Merge**  | PR events          | Auto-merges Dependabot PRs                                                                                          |
+| **Node Compat** | Push               | Tests across Node.js versions                                                                                       |
 
 CI asserts a clean repo after each check (`assert-repo-is-clean`), so formatting and codegen must be committed.
 
