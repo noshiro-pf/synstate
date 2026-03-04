@@ -47,9 +47,14 @@ import { type CounterObservable } from '../types/index.mjs';
  */
 export const counter = (
   intervalMilliSeconds: number,
-  startManually?: boolean,
+  options?: Readonly<{
+    startManually?: boolean;
+  }>,
 ): CounterObservable =>
-  new CounterObservableClass(intervalMilliSeconds, startManually);
+  new CounterObservableClass(
+    intervalMilliSeconds,
+    options?.startManually ?? false,
+  );
 
 class CounterObservableClass
   extends RootObservableClass<SafeUint>
@@ -61,7 +66,7 @@ class CounterObservableClass
   #mut_timerId: TimerId | undefined;
   #mut_isStarted: boolean;
 
-  constructor(intervalMilliSeconds: number, startManually?: boolean) {
+  constructor(intervalMilliSeconds: number, startManually: boolean) {
     super({ initialValue: Optional.none });
 
     this.#intervalMilliSeconds = intervalMilliSeconds;
@@ -74,16 +79,16 @@ class CounterObservableClass
 
     this.#mut_isStarted = false;
 
-    if (startManually !== true) {
+    if (!startManually) {
       this.start();
     }
   }
 
-  start(): this {
+  start(): void {
     if (this.#mut_isStarted) {
       console.warn('cannot start twice');
 
-      return this;
+      return;
     }
 
     this.#mut_isStarted = true;
@@ -91,10 +96,9 @@ class CounterObservableClass
     if (this.isCompleted) {
       console.warn('cannot restart stopped CounterObservable');
 
-      return this;
+      return;
     }
 
-    // emit zero
     this.#mut_timerId0 = setTimeout(() => {
       this.startUpdate(this.#mut_counter);
     }, 0);
@@ -104,8 +108,6 @@ class CounterObservableClass
 
       this.startUpdate(this.#mut_counter);
     }, this.#intervalMilliSeconds);
-
-    return this;
   }
 
   #resetTimer(): void {

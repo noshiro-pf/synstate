@@ -31,7 +31,7 @@ const createStreams1 = (
   debounced$: Observable<number>;
   debouncedWithIndex$: Observable<readonly [number, number]>;
 }> => {
-  const counter$ = counter(tick, true);
+  const counter$ = counter(tick, { startManually: true });
 
   const counter200$ = counter$.pipe(take(asPositiveSafeInt(200)));
 
@@ -67,7 +67,7 @@ const createStreams2 = (
   debounced$: Observable<number>;
   combined$: Observable<readonly [number, number]>;
 }> => {
-  const counter$ = counter(tick, true);
+  const counter$ = counter(tick, { startManually: true });
 
   const counter40$ = counter$.pipe(take(asPositiveSafeInt(40)));
 

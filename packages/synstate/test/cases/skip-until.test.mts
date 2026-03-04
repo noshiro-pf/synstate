@@ -25,11 +25,11 @@ const createStreams = (
   timer$: Observable<number>;
   skipUntil$: Observable<number>;
 }> => {
-  const counter$ = counter(tick * 2, true);
+  const counter$ = counter(tick * 2, { startManually: true });
 
   const counter10$ = counter$.pipe(take(10));
 
-  const timer$ = timer(tick * 9, true);
+  const timer$ = timer(tick * 9, { startManually: true });
 
   const skipUntil$ = counter10$.pipe(skipUntil(timer$));
 

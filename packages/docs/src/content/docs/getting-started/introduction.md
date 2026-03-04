@@ -63,42 +63,65 @@ The three main methods you'll use are:
 Here is how these methods relate to each other:
 
 ```
-                          pipe(map(x => x * 2))
-                        ┌───────────────────────┐
-                        │                       ▼
-┌─────────────────┐     │     ┌─────────────────────────┐
-│  state (Observable)  │──┤     │  derived (Observable)      │
-│  value: 1       │     │     │  value: 2               │
-└────┬────────────┘     │     └────┬────────────────────┘
-     │                  │          │
-     │ getSnapshot()    │          │ subscribe(fn)
-     │   → 1            │          │   → fn(2) is called
-     │                  │          │     on every change
-     │ subscribe(fn)    │          │
-     │   → fn(1)        │          │ getSnapshot()
-     │                  │          │   → 2
-     └──────────────────┘          └────────────────────────
+                    pipe(map(x => x * 2))
+                 ┌─────────────────────────┐
+                 │                         ▼
+┌──────────────────────┐           ┌─────────────────────────┐
+│  state (Observable)  │           │  derived (Observable)   │
+│  value: 1            │           │  value: 2               │
+└────┬─────────────────┘           └────┬────────────────────┘
+     │                                  │
+     │ getSnapshot()                    │ subscribe(fn)
+     │   → 1                            │   → fn(2) is called
+     │                                  │     on every change
+     │ subscribe(fn)                    │
+     │   → fn(1)                        │ getSnapshot()
+     │                                  │   → 2
+     └───────────────────────           └────────────────────────
 ```
 
 For example:
 
-```ts
-import { createState, map } from 'synstate';
+```tsx
+import { combine, createState, InitializedObservable, map } from 'synstate';
 
-const [count, setCount] = createState(0);
+const [count, setCount] = createState<number>(0);
 
 // Read the current value
-console.log(count.getSnapshot()); // 0
+console.log(count.getSnapshot().value); // 0
 
-// Derive a new Observable using pipe
-const doubled = count.pipe(map((n) => n * 2));
+// Derive new Observables using pipe
+const doubled: InitializedObservable<number> = count.pipe(map((n) => n * 2));
+
+// Combine multiple Observables
+const combined: InitializedObservable<string> = combine([count, doubled]).pipe(
+    map(([c, d]) => `count=${c}, doubled=${d}`),
+);
 
 // Subscribe to changes
-doubled.subscribe((value) => {
-    console.log('doubled:', value); // "doubled: 0", then "doubled: 2"
+count.subscribe((value) => {
+    console.log('count:', value); // 0, 1, 2, 3, 4
 });
 
-setCount(1);
+doubled.subscribe((value) => {
+    console.log('doubled:', value); // 0, 2, 4, 6, 8
+});
+
+combined.subscribe((value) => {
+    console.log(value); // "count=0, doubled=0", "count=1, doubled=2", ...
+});
+
+let cnt = 0;
+
+const timer = setInterval(() => {
+    cnt += 1;
+
+    setCount(cnt);
+}, 1000 /* ms */);
+
+setTimeout(() => {
+    clearTimeout(timer);
+}, 5000);
 ```
 
 Although `createState` looks similar to React's `useState`, it is fundamentally different. The first element of the return value is an `InitializedObservable<T>` — a specialized Observable provided by SynState that always holds an initial value — not a plain value.

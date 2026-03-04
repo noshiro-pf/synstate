@@ -29,7 +29,7 @@ const createStreams = (
   counter$: Observable<SafeUint>;
   mergeMap$: Observable<readonly [number, number]>;
 }> => {
-  const counter$ = counter(tick * 7, true);
+  const counter$ = counter(tick * 7, { startManually: true });
 
   const counter7$ = counter$.pipe(take(7));
 

@@ -32,7 +32,7 @@ const createStreams = (
     1, 2, 3, 7, 9, 10, 12, 13, 16, 17, 18, 19, 20,
   ]);
 
-  const counter$ = counter(tick * 2, true);
+  const counter$ = counter(tick * 2, { startManually: true });
 
   const counter21$ = counter$.pipe(take(21));
 

@@ -34,11 +34,11 @@ const createStreams = (
   combined1$: Observable<readonly [number, number]>;
   combined2$: Observable<readonly [number, number]>;
 }> => {
-  const counter$ = counter(tick * 2, true);
+  const counter$ = counter(tick * 2, { startManually: true });
 
   const counter6$ = counter$.pipe(take(6));
 
-  const timer$ = timer(tick * 7, true);
+  const timer$ = timer(tick * 7, { startManually: true });
 
   const combined1$ = combine([counter6$, timer$]);
 

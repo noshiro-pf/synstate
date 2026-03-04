@@ -27,11 +27,11 @@ const createStreams = (
   counter$: Observable<SafeUint>;
   combined$: Observable<readonly [number, number, number]>;
 }> => {
-  const timer1$ = timer(tick * 3, true);
+  const timer1$ = timer(tick * 3, { startManually: true });
 
-  const timer2$ = timer(tick * 5, true);
+  const timer2$ = timer(tick * 5, { startManually: true });
 
-  const counter$ = counter(tick * 2, true);
+  const counter$ = counter(tick * 2, { startManually: true });
 
   const counter7$ = counter$.pipe(take(7));
 

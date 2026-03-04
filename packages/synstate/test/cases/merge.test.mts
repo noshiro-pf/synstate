@@ -25,7 +25,7 @@ const createStreams = (
   odd$: Observable<string>;
   merged$: Observable<number | string>;
 }> => {
-  const counter$ = counter(tick, true);
+  const counter$ = counter(tick, { startManually: true });
 
   const counter6$ = counter$.pipe(take(6));
 

@@ -24,7 +24,7 @@ const createStreams = (
   even$: Observable<number>;
   filtered$: Observable<number>;
 }> => {
-  const counter$ = counter(tick, true);
+  const counter$ = counter(tick, { startManually: true });
 
   const counter20$ = counter$.pipe(take(20));
 

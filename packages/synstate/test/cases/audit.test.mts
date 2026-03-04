@@ -29,7 +29,7 @@ const createStreams = (
 }> => {
   const emitValues = ISet.create([1, 3, 4, 10, 13, 16, 17, 18, 19, 20]);
 
-  const counter$ = counter(tick * 2, true);
+  const counter$ = counter(tick * 2, { startManually: true });
 
   const counter23$ = counter$.pipe(take(23));
 

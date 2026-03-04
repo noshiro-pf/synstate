@@ -24,7 +24,7 @@ const createStreams = (
   multiplesOf3$: Observable<number>;
   zipped$: Observable<readonly [number, number]>;
 }> => {
-  const counter$ = counter(tick, true);
+  const counter$ = counter(tick, { startManually: true });
 
   const counter23$ = counter$.pipe(take(23));
 

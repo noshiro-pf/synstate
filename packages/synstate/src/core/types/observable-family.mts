@@ -32,12 +32,12 @@ export type FromSubscribableObservable<A, E = unknown> = RootObservable<
 >;
 
 export type CounterObservable = Readonly<{
-  start: () => CounterObservable;
+  start: () => void;
 }> &
   RootObservable<SafeUint>;
 
 export type TimerObservable = Readonly<{
-  start: () => TimerObservable;
+  start: () => void;
 }> &
   RootObservable<0>;
 

@@ -13,7 +13,7 @@ const createStreams = (
   quad1$: Observable<number>;
   quad2$: Observable<number>;
 }> => {
-  const counter$ = counter(tick, true);
+  const counter$ = counter(tick, { startManually: true });
 
   const counter11$ = counter$.pipe(take(11));
 

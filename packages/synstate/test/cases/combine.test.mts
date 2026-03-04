@@ -33,7 +33,7 @@ const createStreams = (
   squareEven$: Observable<number>;
   combined$: Observable<readonly [number, number, number, number, number]>;
 }> => {
-  const counter$ = counter(tick, true);
+  const counter$ = counter(tick, { startManually: true });
 
   const counter10$ = counter$.pipe(take(10));
 
@@ -68,7 +68,7 @@ const createStreams2 = (
   multiplied$: Observable<number>;
   sum$: Observable<number>;
 }> => {
-  const counter$ = counter(tick, true);
+  const counter$ = counter(tick, { startManually: true });
 
   const counter5$ = counter$.pipe(take(5));
 

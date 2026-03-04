@@ -16,7 +16,7 @@ const createStreams = (
   counter$: Observable<SafeUint>;
   pluck$: Observable<string>;
 }> => {
-  const counter$ = counter(tick, true);
+  const counter$ = counter(tick, { startManually: true });
 
   const counter5$ = counter$.pipe(take(5));
 

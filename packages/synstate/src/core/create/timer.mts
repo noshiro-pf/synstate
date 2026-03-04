@@ -40,8 +40,11 @@ import { type TimerObservable } from '../types/index.mjs';
  */
 export const timer = (
   milliSeconds: number,
-  startManually: boolean = false,
-): TimerObservable => new TimerObservableClass(milliSeconds, startManually);
+  options?: Readonly<{
+    startManually?: boolean;
+  }>,
+): TimerObservable =>
+  new TimerObservableClass(milliSeconds, options?.startManually ?? false);
 
 class TimerObservableClass
   extends RootObservableClass<0>
@@ -65,11 +68,11 @@ class TimerObservableClass
     }
   }
 
-  start(): this {
+  start(): void {
     if (this.#mut_isStarted) {
       console.warn('cannot start twice');
 
-      return this;
+      return;
     }
 
     this.#mut_isStarted = true;
@@ -77,7 +80,7 @@ class TimerObservableClass
     if (this.isCompleted) {
       console.warn('cannot restart stopped TimerObservable');
 
-      return this;
+      return;
     }
 
     this.#mut_timerId = setTimeout(() => {
@@ -85,8 +88,6 @@ class TimerObservableClass
 
       this.complete();
     }, this.#milliSeconds);
-
-    return this;
   }
 
   #resetTimer(): void {

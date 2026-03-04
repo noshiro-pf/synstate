@@ -28,7 +28,8 @@ const documents: DeepReadonly<
     samplesDir: path.resolve(synstateSamplesRoot, 'docs-site/introduction'),
     sampleCodeFiles: [
       '01-simple-state.mts',
-      '02-synstate-react-hooks-example.tsx',
+      '02-simple-state-with-map.mts',
+      '03-synstate-react-hooks-example.tsx',
     ],
   },
   {

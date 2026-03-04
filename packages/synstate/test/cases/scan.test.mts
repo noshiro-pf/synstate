@@ -10,7 +10,7 @@ const createStreams = (
   counter$: Observable<SafeUint>;
   scan$: Observable<number>;
 }> => {
-  const counter$ = counter(tick, true);
+  const counter$ = counter(tick, { startManually: true });
 
   const counter10$ = counter$.pipe(take(10));
 

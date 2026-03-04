@@ -27,13 +27,13 @@ const createStreams = (
   sampleCounter$: Observable<number>;
   withBufferedFrom$: Observable<DeepReadonly<[number, number[]]>>;
 }> => {
-  const counter$ = counter(tick, true);
+  const counter$ = counter(tick, { startManually: true });
 
   const counter11$ = counter$.pipe(take(11));
 
   const filtered$ = counter11$.pipe(filter((x) => x % 3 !== 0));
 
-  const sampleCounter$ = counter(tick * 3, true);
+  const sampleCounter$ = counter(tick * 3, { startManually: true });
 
   const sampleCounter5$ = sampleCounter$.pipe(take(5));
 

@@ -16,7 +16,7 @@ const createStreams = (
   counter$: Observable<SafeUint>;
   pairwise$: Observable<readonly [number, number]>;
 }> => {
-  const counter$ = counter(tick, true);
+  const counter$ = counter(tick, { startManually: true });
 
   const counter6$ = counter$.pipe(take(6));
 
@@ -38,7 +38,7 @@ const createStreams2 = (
   counter$: Observable<SafeUint | -1>;
   pairwise$: Observable<readonly [number, number]>;
 }> => {
-  const counter$ = counter(tick, true);
+  const counter$ = counter(tick, { startManually: true });
 
   const counter6$ = counter$.pipe(take(6)).pipe(withInitialValue(-1 as const));
 
