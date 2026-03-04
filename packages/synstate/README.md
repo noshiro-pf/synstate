@@ -562,6 +562,8 @@ import { createEventEmitter, throttle } from 'synstate';
 
 // Create event emitter
 const [refreshClicked, onRefreshClick] = createEventEmitter();
+// refreshClicked: Observable<void>
+// onRefreshClick: () => void
 
 // Subscribe to events
 refreshClicked.subscribe(() => {
