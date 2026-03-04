@@ -1,5 +1,7 @@
 ---
 title: API Reference
+sidebar:
+    order: 1
 ---
 
 ## State Management
