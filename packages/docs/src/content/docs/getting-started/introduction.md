@@ -68,15 +68,15 @@ Here is how these methods relate to each other:
                  │                         ▼
 ┌──────────────────────┐           ┌─────────────────────────┐
 │  state (Observable)  │           │  derived (Observable)   │
-│  value: 1            │           │  value: 2               │
+│  value: 100          │           │  value: 200             │
 └────┬─────────────────┘           └────┬────────────────────┘
      │                                  │
-     │ getSnapshot()                    │ subscribe(fn)
-     │   → 1                            │   → fn(2) is called
-     │                                  │     on every change
-     │ subscribe(fn)                    │
-     │   → fn(1)                        │ getSnapshot()
-     │                                  │   → 2
+     │ getSnapshot()                    │ getSnapshot()
+     │   → 100                          │   → 200
+     │                                  │
+     │ subscribe(fn)                    │ subscribe(fn)
+     │   → fn is called with 100        │   → fn is called with 200
+     │                                  │
      └───────────────────────           └────────────────────────
 ```
 
@@ -128,6 +128,10 @@ setTimeout(() => {
     clearTimeout(timer);
 }, 5000);
 ```
+
+<p align="center">
+  <img src="/synstate/what-is-observable.png" alt="What is an Observable" width="400" />
+</p>
 
 Although `createState` looks similar to React's `useState`, it is fundamentally different. The first element of the return value is an `InitializedObservable<T>` — a specialized Observable provided by SynState that always holds an initial value — not a plain value.
 

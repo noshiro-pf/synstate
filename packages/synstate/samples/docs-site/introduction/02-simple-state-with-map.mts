@@ -15,7 +15,7 @@ const doubled: InitializedObservable<number> = count.pipe(map((n) => n * 2));
 
 // Combine multiple Observables
 const combined: InitializedObservable<string> = combine([count, doubled]).pipe(
-  map(([c, d]) => `count=${c}, doubled=${d}`),
+  map(([c, d]) => `(${c}, ${d})`),
 );
 
 // Subscribe to changes
@@ -28,7 +28,7 @@ doubled.subscribe((value) => {
 });
 
 combined.subscribe((value) => {
-  console.log(value); // "count=0, doubled=0", "count=1, doubled=2", ...
+  console.log(value); // "(0, 0)", "(1, 2)", ...
 });
 
 let cnt = 0;
