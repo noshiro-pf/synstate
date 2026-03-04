@@ -70,11 +70,15 @@ const SearchBox = (): React.JSX.Element => {
 
 ## Event Emitter with Throttle
 
+To create an Observable with no value, you can use the `createEventEmitter` API.
+
 ```tsx
 import { createEventEmitter, throttle } from 'synstate';
 
 // Create event emitter
 const [refreshClicked, onRefreshClick] = createEventEmitter();
+// refreshClicked: Observable<void>
+// onRefreshClick: () => void
 
 // Subscribe to events
 refreshClicked.subscribe(() => {
