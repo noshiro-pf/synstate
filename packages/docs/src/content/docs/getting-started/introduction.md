@@ -48,7 +48,7 @@ setState(1);
 
 `createState` creates a reactive state and a setter function. Subscribers are notified immediately with the initial value, and again whenever the state is updated.
 
-### What is an Observable?
+## What is an "Observable"?
 
 In SynState, an **Observable** is a reactive value container that notifies subscribers whenever its value changes. Unlike a plain variable, an Observable allows you to _react_ to state changes declaratively.
 
@@ -63,7 +63,7 @@ The three main methods you'll use are:
 Here is how these methods relate to each other:
 
 ```
-                    pipe(map(x => x * 2))
+                      map(x => x * 2)
                  ┌─────────────────────────┐
                  │                         ▼
 ┌──────────────────────┐           ┌─────────────────────────┐
@@ -100,7 +100,7 @@ const doubled: InitializedObservable<number> = count.pipe(map((n) => n * 2));
 
 // Combine multiple Observables
 const combined: InitializedObservable<string> = combine([count, doubled]).pipe(
-    map(([c, d]) => `count=${c}, doubled=${d}`),
+    map(([c, d]) => `(${c}, ${d})`),
 );
 
 // Subscribe to changes
@@ -113,7 +113,7 @@ doubled.subscribe((value) => {
 });
 
 combined.subscribe((value) => {
-    console.log(value); // "count=0, doubled=0", "count=1, doubled=2", ...
+    console.log(value); // "(0, 0)", "(1, 2)", ...
 });
 
 let cnt = 0;
@@ -128,6 +128,8 @@ setTimeout(() => {
     clearTimeout(timer);
 }, 5000);
 ```
+
+The relationship between the Observables in this example can be illustrated as follows:
 
 <p align="center">
   <img src="/synstate/what-is-observable.png" alt="What is an Observable" width="400" />
