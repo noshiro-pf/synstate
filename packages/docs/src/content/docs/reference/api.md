@@ -1,4 +1,6 @@
 ---
+prev: false
+next: false
 title: API Reference
 sidebar:
     order: 1
