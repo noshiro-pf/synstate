@@ -6,9 +6,9 @@ sidebar:
 
 ## Simple to Start, Powerful When You Need It
 
-SynState is a state management library for web frontends. For most use cases, `createState`, `createReducer`, and simple combinators like `combine` and `map` are all you need — clean, minimal APIs that feel as intuitive as React's `useState` / `useReducer`, but for global state.
+SynState is a state management library for web frontends. For most use cases, `createState`, `createReducer`, and simple combinators like `combine` and `map` are all you need — clean, minimal APIs that feel as intuitive as React's `useState` / `useReducer`, but for global state. For example, a [Dark Mode toggle](/synstate/examples/react/#boolean-state-dark-mode) can be implemented in just a few lines.
 
-When your requirements grow more complex, SynState scales with you. Built on its own Observable implementation, it provides operators like `debounce`, `throttle`, `switchMap`, and `mergeMap` for sophisticated asynchronous state management — without requiring an additional library like RxJS. You can describe everything from a simple counter to a debounced search pipeline with auto-cancellation in a single, unified API.
+When your requirements grow more complex, SynState scales with you. Built on its own Observable implementation, it provides operators like `debounce`, `throttle`, `switchMap`, and `mergeMap` for sophisticated asynchronous state management — without requiring an additional library like RxJS. You can describe everything from a simple counter to a [debounced search pipeline with auto-cancellation](/synstate/examples/advanced/#search-with-debounce) in a single, unified API.
 
 ## Why Observable-Based?
 
