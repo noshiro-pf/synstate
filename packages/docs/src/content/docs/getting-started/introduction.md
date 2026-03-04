@@ -54,11 +54,11 @@ In SynState, an **Observable** is a reactive value container that notifies subsc
 
 The three main methods you'll use are:
 
-| Method | Description |
-|---|---|
-| `getSnapshot()` | Synchronously read the current value |
-| `subscribe(fn)` | Register a callback that runs on every value change |
-| `pipe(operator)` | Transform the Observable into a new Observable |
+| Method           | Description                                         |
+| ---------------- | --------------------------------------------------- |
+| `getSnapshot()`  | Synchronously read the current value                |
+| `subscribe(fn)`  | Register a callback that runs on every value change |
+| `pipe(operator)` | Transform the Observable into a new Observable      |
 
 Here is how these methods relate to each other:
 
