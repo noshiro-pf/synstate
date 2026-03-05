@@ -2,14 +2,7 @@
 import { atom, createStore } from 'jotai';
 import { range } from 'ts-data-forge';
 import { type Point, type SpringAdapter } from '../types.js';
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from './synstate-adapter.js';
-
-const LERP_FACTOR = 0.3;
-
-const lerp = (current: Point, target: Point, factor: number): Point => ({
-  x: current.x + (target.x - current.x) * factor,
-  y: current.y + (target.y - current.y) * factor,
-});
+import { CANVAS_HEIGHT, CANVAS_WIDTH, LERP_FACTOR, lerp } from './shared.mjs';
 
 export const createJotaiSpringAdapter = (): SpringAdapter => {
   let mut_store: ReturnType<typeof createStore> | undefined;

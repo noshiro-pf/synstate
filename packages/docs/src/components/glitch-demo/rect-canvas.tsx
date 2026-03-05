@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from './adapters/synstate-adapter.js';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from './adapters/index.js';
 import { type Adapter, type Point } from './types.js';
 
 type Stats = Readonly<{
@@ -13,7 +13,9 @@ type Props = Readonly<{
 }>;
 
 const DOT_RADIUS = 2.5;
+
 const COLOR_NORMAL = 'rgba(59, 130, 246, 0.7)';
+
 const COLOR_GLITCH = 'rgba(239, 68, 68, 0.7)';
 
 const INITIAL_STATS: Stats = {
@@ -24,8 +26,11 @@ const INITIAL_STATS: Stats = {
 
 export const RectCanvas: React.FC<Props> = ({ adapter }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
   const latestPosRef = useRef<Point>({ x: -1, y: -1 });
+
   const isDraggingRef = useRef(false);
+
   const [stats, setStats] = useState<Stats>(INITIAL_STATS);
 
   // Setup adapter once on mount
@@ -33,18 +38,24 @@ export const RectCanvas: React.FC<Props> = ({ adapter }) => {
     adapter.setup({
       onEmit: (pos) => {
         if (!isDraggingRef.current) return;
+
         if (pos.x < 0 || pos.y < 0) return;
 
         const t0 = performance.now();
+
         const latestPos = latestPosRef.current;
+
         const mut_glitch = pos.x !== latestPos.x || pos.y !== latestPos.y;
 
         const mut_ctx = canvasRef.current?.getContext('2d');
 
         if (mut_ctx != null) {
           mut_ctx.beginPath();
+
           mut_ctx.arc(pos.x, pos.y, DOT_RADIUS, 0, Math.PI * 2);
+
           mut_ctx.fillStyle = mut_glitch ? COLOR_GLITCH : COLOR_NORMAL;
+
           mut_ctx.fill();
         }
 

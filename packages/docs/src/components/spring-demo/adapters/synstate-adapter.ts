@@ -1,25 +1,19 @@
-import { combine, map, scan, source, type Observable } from 'synstate';
 import {
-  type Point,
-  type SpringAdapter,
-  type Subscription,
-} from '../types.js';
+  combine,
+  map,
+  scan,
+  source,
+  type Observable,
+  type WithInitialValueOperator,
+} from 'synstate';
+import { Arr, range } from 'ts-data-forge';
+import { type Point, type SpringAdapter, type Subscription } from '../types.js';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, LERP_FACTOR, lerp } from './shared.mjs';
 
-export const CANVAS_WIDTH = 500;
-export const CANVAS_HEIGHT = 400;
-
-const LERP_FACTOR = 0.3;
-
-const lerp = (current: Point, target: Point, factor: number): Point => ({
-  x: current.x + (target.x - current.x) * factor,
-  y: current.y + (target.y - current.y) * factor,
-});
-
-const springOperator = (startPos: Point) =>
-  scan(
-    (acc: Point, target: Point) => lerp(acc, target, LERP_FACTOR),
-    startPos,
-  );
+const springOperator = (
+  startPos: Point,
+): WithInitialValueOperator<Point, Point> =>
+  scan((acc: Point, target: Point) => lerp(acc, target, LERP_FACTOR), startPos);
 
 export const createSynStateSpringAdapter = (): SpringAdapter => {
   let mut_mousePos: ReturnType<typeof source<Point>> | undefined;
@@ -35,25 +29,24 @@ export const createSynStateSpringAdapter = (): SpringAdapter => {
 
       // Build deep scan chain: each stage follows the previous
       const head = mut_mousePos;
+
       const mut_stages: Observable<Point>[] = [];
 
       let mut_prev: Observable<Point> = head;
 
-      for (let mut_i = 0; mut_i < chainDepth; mut_i++) {
+      for (const _ of range(0, chainDepth)) {
         mut_prev = mut_prev.pipe(springOperator(startPos));
 
         mut_stages.push(mut_prev);
       }
 
-      if (mut_stages.length === 0) {
+      if (Arr.isArrayOfLength(mut_stages, 0)) {
         // No chain depth — just emit the head
-        mut_subscription = head
-          .pipe(map((pos) => [pos]))
-          .subscribe(onEmit);
+        mut_subscription = head.pipe(map((pos) => [pos])).subscribe(onEmit);
       } else {
         // Combine head + all stages into a single Point[]
         const allPoints = combine([head, ...mut_stages] as const).pipe(
-          map((points) => [...points]),
+          map((points) => points),
         );
 
         mut_subscription = allPoints.subscribe(onEmit);

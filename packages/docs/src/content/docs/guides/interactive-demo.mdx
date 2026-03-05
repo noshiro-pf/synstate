@@ -62,15 +62,43 @@ mousePos (head)
         ...
 ```
 
-Increase the chain depth with the slider. At higher values, the per-update cost grows — watch for stutter and rising μs/update.
+To draw the full snake, all N stage outputs are collected with `combine` / `combineLatest`:
+
+```
+combine([source, scan₁, scan₂, ..., scanN]) → subscriber (draw snake)
+```
+
+Increase the chain depth with the slider. At higher values, watch for stutter and rising μs/update.
 
 <SpringDemo client:only="react" />
 
 ### What to look for
 
 - At **low N** (10–50): all three libraries render smoothly
-- At **high N** (200+): Jotai's `store.get()` / `store.set()` overhead per stage accumulates, causing visible stutter and higher μs/update
-- SynState and RxJS handle deep chains efficiently thanks to push-based propagation
+- At **N > 300**: Jotai starts stuttering due to per-operation overhead of `store.get()` / `store.set()` at each stage
+- At **N > 350**: RxJS also starts stuttering — and its **Total updates** counter is dramatically higher than SynState's
+- **SynState** stays smooth even at N = 400+
+
+### Why RxJS struggles here
+
+Check the **Total updates** counter: RxJS shows roughly **N+1 times** more updates than SynState for the same mouse movement. This is because `combineLatest` fires every time **any** of its N+1 inputs emits. On a single mouse move:
+
+1. `source` emits → `combineLatest` fires (only source is updated, all scans still hold old values)
+2. `scan₁` emits → `combineLatest` fires again
+3. `scan₂` emits → `combineLatest` fires again
+4. ... and so on for all N stages
+
+Each of these N+1 firings triggers a full canvas redraw. This makes the total cost per mouse event **O(N²)** — N+1 draw calls, each drawing N+1 points.
+
+SynState's `combine` uses depth-based topological ordering: it waits for all N scan stages to finish propagation, then fires the subscriber **exactly once**. Total cost: **O(N)** — one draw call per mouse event.
+
+| Library      | Scan propagation          | Subscriber calls per mouse event | Total work per event     |
+| ------------ | ------------------------- | -------------------------------- | ------------------------ |
+| **SynState** | N stages (push)           | **1**                            | O(N)                     |
+| **RxJS**     | N stages (push)           | **N+1** (combineLatest glitch)   | O(N²)                    |
+| **Jotai**    | N stages (manual set/get) | **1**                            | O(N) but higher constant |
+
+This is the glitch problem manifesting as a **performance cliff**: the intermediate emissions from `combineLatest` aren't just incorrect — each one triggers expensive side effects.
 
 ### Related
 
