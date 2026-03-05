@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from './adapters/index.js';
-import { type Adapter, type Point } from './types.js';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from './adapters/index.mjs';
+import { type Adapter, type Point } from './types.mjs';
 
 type Stats = Readonly<{
   totalUpdates: number;
@@ -72,7 +72,6 @@ export const RectCanvas: React.FC<Props> = ({ adapter }) => {
     return () => {
       adapter.cleanup();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getCanvasPos = useCallback(

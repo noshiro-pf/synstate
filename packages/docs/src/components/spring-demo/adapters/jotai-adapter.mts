@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { atom, createStore } from 'jotai';
 import { range } from 'ts-data-forge';
-import { type Point, type SpringAdapter } from '../types.js';
+import { type Point, type SpringAdapter } from '../types.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, LERP_FACTOR, lerp } from './shared.mjs';
 
 export const createJotaiSpringAdapter = (): SpringAdapter => {

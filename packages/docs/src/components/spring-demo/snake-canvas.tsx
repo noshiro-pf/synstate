@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Arr, asSafeUint, range } from 'ts-data-forge';
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from './adapters/index.js';
-import { type Point, type SpringAdapter } from './types.js';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from './adapters/index.mjs';
+import { type Point, type SpringAdapter } from './types.mjs';
 
 type Stats = Readonly<{
   totalUpdates: number;

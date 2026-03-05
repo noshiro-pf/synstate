@@ -3,7 +3,7 @@ import {
   createJotaiAdapter,
   createRxJSAdapter,
   createSynStateAdapter,
-} from './adapters/index.js';
+} from './adapters/index.mjs';
 import { RectCanvas } from './rect-canvas.js';
 
 export const GlitchDemo: React.FC = () => {

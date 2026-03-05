@@ -7,7 +7,7 @@ import {
   type Subscription,
 } from 'rxjs';
 import { Arr, range } from 'ts-data-forge';
-import { type Point, type SpringAdapter } from '../types.js';
+import { type Point, type SpringAdapter } from '../types.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, LERP_FACTOR, lerp } from './shared.mjs';
 
 export const createRxJSSpringAdapter = (): SpringAdapter => {

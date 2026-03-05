@@ -3,7 +3,7 @@ import {
   createJotaiSpringAdapter,
   createRxJSSpringAdapter,
   createSynStateSpringAdapter,
-} from './adapters/index.js';
+} from './adapters/index.mjs';
 import { SnakeCanvas } from './snake-canvas.js';
 
 const DEFAULT_CHAIN_DEPTH = 50;

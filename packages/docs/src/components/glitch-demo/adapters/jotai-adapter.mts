@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { atom, createStore } from 'jotai';
-import { type Adapter, type Point } from '../types.js';
+import { type Adapter, type Point } from '../types.mjs';
 
 export const createJotaiAdapter = (): Adapter => {
   let mut_store: ReturnType<typeof createStore> | undefined;
