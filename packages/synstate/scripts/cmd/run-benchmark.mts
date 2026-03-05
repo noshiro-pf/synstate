@@ -31,7 +31,7 @@ const scenarios: readonly Scenario[] = [
     expectedValue: N * 4,
     resultsFile: 'results.md',
     entries: [
-      { name: 'synstate', file: '01-derived-chain.synstate.mts' },
+      { name: 'SynState', file: '01-derived-chain.synstate.mts' },
       { name: 'RxJS', file: '01-derived-chain.rxjs.mts' },
       { name: 'MobX', file: '01-derived-chain.mobx.mts' },
       { name: 'Jotai', file: '01-derived-chain.jotai.mts' },
@@ -44,7 +44,7 @@ const scenarios: readonly Scenario[] = [
     expectedValue: N * 5,
     resultsFile: 'results-diamond.md',
     entries: [
-      { name: 'synstate', file: '02-diamond-dependency.synstate.mts' },
+      { name: 'SynState', file: '02-diamond-dependency.synstate.mts' },
       { name: 'RxJS', file: '02-diamond-dependency.rxjs.mts' },
       { name: 'MobX', file: '02-diamond-dependency.mobx.mts' },
       { name: 'Jotai', file: '02-diamond-dependency.jotai.mts' },
@@ -88,7 +88,6 @@ const runScenario = async (scenario: Scenario): Promise<void> => {
     // Verify correctness
     const check = mod.runBenchmark(1000);
 
-    // eslint-disable-next-line total-functions/no-partial-division
     const expectedCheck = (scenario.expectedValue / N) * 1000;
 
     if (check !== expectedCheck) {
