@@ -23,7 +23,8 @@ import {
  * //
  * //  ids$          1               2               3
  * //  requests      fetch(1)        fetch(2)        fetch(3)
- * //  users$        result1         result2         result3
+ * //  responses               -> result1      -> result2  -> result3
+ * //  mergeMapped                result1         result2     result3
  * //                (parallel)      (parallel)      (parallel)
  * //
  * //  Explanation:
@@ -42,7 +43,7 @@ import {
  *       result$.next({ id });
  *
  *       result$.complete();
- *     }, 10);
+ *     }, Math.random() * 100);
  *
  *     return result$;
  *   }),
@@ -64,13 +65,10 @@ import {
  *   setTimeout(resolve, 200);
  * });
  *
- * assert.deepStrictEqual(valueHistory.length, 3);
- *
- * assert.isTrue(valueHistory.some((u) => u.id === 1));
- *
- * assert.isTrue(valueHistory.some((u) => u.id === 2));
- *
- * assert.isTrue(valueHistory.some((u) => u.id === 3));
+ * assert.deepStrictEqual(
+ *   new Set(valueHistory.map((u) => u.id)),
+ *   new Set([1, 2, 3]),
+ * );
  * ```
  *
  * @note To improve code readability, consider using `createState` instead of `mergeMap`,

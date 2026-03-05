@@ -21,8 +21,8 @@ Unlike `throttle` which emits the first value, `audit` emits the last value.
 //
 //  Time(ms)  0    100   200   300   400   ...   1000  1100
 //  input$    e1   e2    e3    e4    e5
-//  audited$                                      e5 (emitted at end of window)
-//            |-------1000ms window------>        ^
+//  audited$                                     e5 (emitted at end of window)
+//            |-------1000ms window------>       ^
 //
 //  Explanation:
 //  - audit emits the LAST value received during each time window

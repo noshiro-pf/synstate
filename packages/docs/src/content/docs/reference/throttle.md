@@ -18,10 +18,10 @@ After the duration, the next emission is allowed through.
 ```tsx
 //  Timeline (1000ms throttle):
 //
-//  Time(ms)  0    100   200   300   ...   1000  1100  1200  ...   2000  2100
-//  scroll$   e1   e2    e3    e4          e5    e6    e7          e8    e9
-//  throttled$ e1                          e5                      e8
-//             |-------1000ms------>       |------1000ms------>    |------1000ms------>
+//  Time(ms)   0    100   200   300   ...   1000  1100  1200  ...   2000  2100
+//  scroll$    e1   e2    e3    e4          e5    e6    e7          e8    e9
+//  throttled$ e1                           e5                      e8
+//             |-------1000ms------>        |------1000ms------>    |------1000ms------>
 //
 //  Explanation:
 //  - throttle emits the first value immediately, then ignores subsequent values

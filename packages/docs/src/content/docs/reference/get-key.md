@@ -31,8 +31,8 @@ const name$ = user$.pipe(getKey('name'));
 
 const valueHistory: string[] = [];
 
-name$.subscribe((name) => {
-    valueHistory.push(name);
+name$.subscribe((n) => {
+    valueHistory.push(n);
 });
 
 user$.next({ name: 'Alice', age: 25 });

@@ -16,7 +16,7 @@ import { type FromPromiseObservable } from '../types/index.mjs';
  * //  Timeline:
  * //
  * //  promise     [pending...]  -> resolved/rejected
- * //  data$                     Ok(value) or Err(error)
+ * //  data$                        Ok(value) or Err(error)
  * //
  * //  Explanation:
  * //  - fromPromise converts a Promise into an observable

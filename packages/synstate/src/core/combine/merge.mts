@@ -23,7 +23,7 @@ import {
  * ```ts
  * //  Timeline:
  * //
- * //  clicks$   c1          c2                    c3
+ * //  clicks$   c1              c2                c3
  * //  keys$               k1          k2                    k3
  * //  events$   c1        k1    c2    k2          c3        k3
  * //
