@@ -18,13 +18,39 @@ type BenchmarkEntry = Readonly<{
   file: string;
 }>;
 
-const benchmarks: readonly BenchmarkEntry[] = [
-  { name: 'synstate', file: '01-derived-chain.synstate.mts' },
-  { name: 'RxJS', file: '01-derived-chain.rxjs.mts' },
-  { name: 'MobX', file: '01-derived-chain.mobx.mts' },
-  { name: 'Jotai', file: '01-derived-chain.jotai.mts' },
-  { name: 'Redux', file: '01-derived-chain.redux.mts' },
-  { name: 'Zustand', file: '01-derived-chain.zustand.mts' },
+type Scenario = Readonly<{
+  title: string;
+  expectedValue: number;
+  resultsFile: string;
+  entries: readonly BenchmarkEntry[];
+}>;
+
+const scenarios: readonly Scenario[] = [
+  {
+    title: 'Derived Chain',
+    expectedValue: N * 4,
+    resultsFile: 'results.md',
+    entries: [
+      { name: 'synstate', file: '01-derived-chain.synstate.mts' },
+      { name: 'RxJS', file: '01-derived-chain.rxjs.mts' },
+      { name: 'MobX', file: '01-derived-chain.mobx.mts' },
+      { name: 'Jotai', file: '01-derived-chain.jotai.mts' },
+      { name: 'Redux', file: '01-derived-chain.redux.mts' },
+      { name: 'Zustand', file: '01-derived-chain.zustand.mts' },
+    ],
+  },
+  {
+    title: 'Diamond Dependency',
+    expectedValue: N * 5,
+    resultsFile: 'results-diamond.md',
+    entries: [
+      { name: 'synstate', file: '02-diamond-dependency.synstate.mts' },
+      { name: 'RxJS', file: '02-diamond-dependency.rxjs.mts' },
+      { name: 'MobX', file: '02-diamond-dependency.mobx.mts' },
+      { name: 'Jotai', file: '02-diamond-dependency.jotai.mts' },
+      { name: 'Redux', file: '02-diamond-dependency.redux.mts' },
+    ],
+  },
 ];
 
 const benchmarkDir = path.resolve(
@@ -46,14 +72,14 @@ const p95 = (sorted: readonly number[]): number =>
 const formatNumber = (n: number): string =>
   n.toLocaleString('en-US', { maximumFractionDigits: 0 });
 
-const run = async (): Promise<void> => {
+const runScenario = async (scenario: Scenario): Promise<void> => {
   console.log(
-    `Benchmark: Derived Chain (N=${formatNumber(N)}, ${WARMUP_ROUNDS} warmup + ${MEASURE_ROUNDS} measured rounds)\n`,
+    `\n## ${scenario.title} (N=${formatNumber(N)}, ${WARMUP_ROUNDS} warmup + ${MEASURE_ROUNDS} measured rounds)\n`,
   );
 
   const mut_results: { name: string; times: number[] }[] = [];
 
-  for (const entry of benchmarks) {
+  for (const entry of scenario.entries) {
     const filePath = path.resolve(benchmarkDir, entry.file);
 
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -62,8 +88,13 @@ const run = async (): Promise<void> => {
     // Verify correctness
     const check = mod.runBenchmark(1000);
 
-    if (check !== 4000) {
-      console.error(`❌ ${entry.name}: expected 4000 but got ${String(check)}`);
+    // eslint-disable-next-line total-functions/no-partial-division
+    const expectedCheck = (scenario.expectedValue / N) * 1000;
+
+    if (check !== expectedCheck) {
+      console.error(
+        `❌ ${entry.name}: expected ${String(expectedCheck)} but got ${String(check)}`,
+      );
 
       process.exit(1);
     }
@@ -125,11 +156,13 @@ const run = async (): Promise<void> => {
   console.log(tableContent);
 
   // Write to file for docs embedding
-  const resultsPath = path.resolve(benchmarkDir, 'results.md');
+  const resultsPath = path.resolve(benchmarkDir, scenario.resultsFile);
 
   await fs.writeFile(resultsPath, `${tableContent}\n`, 'utf8');
 
   console.log(`\n✓ Results written to ${resultsPath}`);
 };
 
-await run();
+for (const scenario of scenarios) {
+  await runScenario(scenario);
+}

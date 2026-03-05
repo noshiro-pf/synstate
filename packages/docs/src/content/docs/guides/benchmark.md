@@ -25,12 +25,12 @@ counter (initial: 0)
 
 | Library  | Median (ms) | Min (ms) | Max (ms) | p95 (ms) |    Ops/sec |
 | -------- | ----------: | -------: | -------: | -------: | ---------: |
-| synstate |       12.08 |     9.45 |    30.60 |    22.76 |  8,280,842 |
-| RxJS     |        3.69 |     3.31 |     6.90 |     6.44 | 27,094,158 |
-| MobX     |       73.32 |    69.86 |    75.95 |    75.04 |  1,363,888 |
-| Jotai    |      359.47 |   349.09 |   394.57 |   376.47 |    278,189 |
-| Redux    |      183.81 |   173.46 |   216.26 |   210.77 |    544,053 |
-| Zustand  |        2.70 |     2.60 |     3.77 |     2.91 | 37,097,293 |
+| synstate |       11.84 |     9.59 |    17.97 |    15.51 |  8,445,956 |
+| RxJS     |        3.47 |     3.33 |     4.13 |     3.90 | 28,816,384 |
+| MobX     |       78.12 |    75.31 |    82.48 |    79.07 |  1,280,083 |
+| Jotai    |      354.23 |   338.64 |   374.62 |   367.07 |    282,306 |
+| Redux    |      181.33 |   171.76 |   228.22 |   217.48 |    551,467 |
+| Zustand  |        2.85 |     2.71 |     3.45 |     3.16 | 35,115,516 |
 
 <!-- /benchmark-result -->
 
@@ -221,6 +221,210 @@ export const runBenchmark = (n: number): number => {
 
     for (let mut_i = 1; mut_i <= n; mut_i++) {
         store.setState({ counter: mut_i });
+    }
+
+    return mut_lastValue;
+};
+```
+
+## Scenario: Diamond Dependency
+
+A diamond-shaped dependency graph that tests how each library handles multiple derived values merging back into one:
+
+```txt
+counter (initial: 0)
+  ├── doubled = counter × 2
+  └── tripled = counter × 3
+       └── sum = doubled + tripled  (= counter × 5)
+             └── subscriber: records last received value
+```
+
+- Loop: update counter synchronously from 1 to N (N = 100,000)
+- Verify: final value === N × 5
+- Zustand is excluded because it has no mechanism to combine separate derived values
+
+:::caution[RxJS Glitch]
+RxJS `combineLatest` fires the subscriber **twice per update** in this diamond graph (once with a stale value, once with the correct value). This doubled work is reflected in the benchmark results. See [How SynState Solved the Glitch](/synstate/guides/how-synstate-solved-the-glitch/) for details.
+:::
+
+### Results
+
+<!-- benchmark-result-diamond -->
+
+| Library  | Median (ms) | Min (ms) | Max (ms) | p95 (ms) |    Ops/sec |
+| -------- | ----------: | -------: | -------: | -------: | ---------: |
+| synstate |       17.33 |    16.01 |    19.31 |    18.88 |  5,770,020 |
+| RxJS     |        9.10 |     8.71 |    10.51 |     9.61 | 10,992,134 |
+| MobX     |       96.01 |    93.79 |    98.92 |    98.41 |  1,041,591 |
+| Jotai    |      525.86 |   515.97 |   549.17 |   539.55 |    190,163 |
+| Redux    |      293.03 |   271.23 |   323.05 |   318.96 |    341,256 |
+
+<!-- /benchmark-result-diamond -->
+
+### Implementation Details
+
+#### SynState
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const [counter, setCounter] = createState(0);
+
+    const doubled = counter.pipe(map((x) => x * 2));
+    const tripled = counter.pipe(map((x) => x * 3));
+
+    const sum = combine([doubled, tripled]).pipe(map(([d, t]) => d + t));
+
+    let mut_lastValue = 0;
+
+    const subscription = sum.subscribe((v) => {
+        mut_lastValue = v;
+    });
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        setCounter(mut_i);
+    }
+
+    subscription.unsubscribe();
+
+    return mut_lastValue;
+};
+```
+
+#### RxJS
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const counter = new BehaviorSubject(0);
+
+    const doubled = counter.pipe(map((x) => x * 2));
+    const tripled = counter.pipe(map((x) => x * 3));
+
+    const sum = combineLatest([doubled, tripled]).pipe(map(([d, t]) => d + t));
+
+    let mut_lastValue = 0;
+
+    const subscription = sum.subscribe((v) => {
+        mut_lastValue = v;
+    });
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        counter.next(mut_i);
+    }
+
+    subscription.unsubscribe();
+
+    return mut_lastValue;
+};
+```
+
+#### MobX
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const state = observable({ counter: 0 });
+
+    const doubled = computed(() => state.counter * 2);
+    const tripled = computed(() => state.counter * 3);
+
+    const sum = computed(() => doubled.get() + tripled.get());
+
+    let mut_lastValue = 0;
+
+    const dispose = reaction(
+        () => sum.get(),
+        (value) => {
+            mut_lastValue = value;
+        },
+        { fireImmediately: true },
+    );
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        runInAction(() => {
+            state.counter = mut_i;
+        });
+    }
+
+    dispose();
+
+    return mut_lastValue;
+};
+```
+
+#### Jotai
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const counterAtom = atom(0);
+
+    const doubledAtom = atom((get) => get(counterAtom) * 2);
+    const tripledAtom = atom((get) => get(counterAtom) * 3);
+
+    const sumAtom = atom((get) => get(doubledAtom) + get(tripledAtom));
+
+    const store = createStore();
+
+    let mut_lastValue = store.get(sumAtom);
+
+    const unsub = store.sub(sumAtom, () => {
+        mut_lastValue = store.get(sumAtom);
+    });
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        store.set(counterAtom, mut_i);
+    }
+
+    unsub();
+
+    return mut_lastValue;
+};
+```
+
+#### Redux
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const counterSlice = createSlice({
+        name: 'counter',
+        initialState: { value: 0 },
+        reducers: {
+            set: (state, action: Readonly<{ payload: number }>) => {
+                state.value = action.payload;
+            },
+        },
+    });
+
+    const store = configureStore({
+        reducer: counterSlice.reducer,
+        middleware: () => new Tuple(),
+    });
+
+    // eslint-disable-next-line unicorn/consistent-function-scoping
+    const selectCounter = (state: Readonly<{ value: number }>): number =>
+        state.value;
+
+    const selectDoubled = createSelector(
+        selectCounter,
+        (counter) => counter * 2,
+    );
+    const selectTripled = createSelector(
+        selectCounter,
+        (counter) => counter * 3,
+    );
+
+    const selectSum = createSelector(
+        selectDoubled,
+        selectTripled,
+        (doubled, tripled) => doubled + tripled,
+    );
+
+    let mut_lastValue = selectSum(store.getState());
+
+    store.subscribe(() => {
+        mut_lastValue = selectSum(store.getState());
+    });
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        store.dispatch(counterSlice.actions.set(mut_i));
     }
 
     return mut_lastValue;
