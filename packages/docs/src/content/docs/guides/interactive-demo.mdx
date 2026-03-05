@@ -1,10 +1,11 @@
 ---
-title: Interactive Glitch Demo
+title: Interactive Demos
 sidebar:
     order: 6
 ---
 
 import { GlitchDemo } from '../../../components/glitch-demo/glitch-demo';
+import { SpringDemo } from '../../../components/spring-demo/spring-demo';
 
 ## See the Diamond Dependency Glitch in Action
 
@@ -46,6 +47,30 @@ In real applications, diamond dependencies appear everywhere — computed styles
 - **Logic bugs** — side effects fire with inconsistent data
 
 SynState eliminates these problems at the library level, with no manual workarounds needed.
+
+---
+
+## Spring-Follower Chain: Performance Under Load
+
+This demo shows how each library handles a **deep reactive chain**. A snake tail follows the mouse — each segment is a stage in a `scan` chain that smoothly follows the previous stage:
+
+```
+mousePos (head)
+  → scan₁: lerp(self, head,    0.3) → tail[0]
+    → scan₂: lerp(self, tail[0], 0.3) → tail[1]
+      → scan₃: lerp(self, tail[1], 0.3) → tail[2]
+        ...
+```
+
+Increase the chain depth with the slider. At higher values, the per-update cost grows — watch for stutter and rising μs/update.
+
+<SpringDemo client:only="react" />
+
+### What to look for
+
+- At **low N** (10–50): all three libraries render smoothly
+- At **high N** (200+): Jotai's `store.get()` / `store.set()` overhead per stage accumulates, causing visible stutter and higher μs/update
+- SynState and RxJS handle deep chains efficiently thanks to push-based propagation
 
 ### Related
 

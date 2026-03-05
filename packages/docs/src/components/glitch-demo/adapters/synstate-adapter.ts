@@ -2,6 +2,7 @@ import { combine, map, source } from 'synstate';
 import { type Adapter, type Point, type Subscription } from '../types.js';
 
 export const CANVAS_WIDTH = 500;
+
 export const CANVAS_HEIGHT = 400;
 
 export const createSynStateAdapter = (): Adapter => {

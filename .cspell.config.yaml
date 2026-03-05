@@ -1,9 +1,10 @@
-version: '0.2'
+version: "0.2"
 language: en
 allowCompoundWords: true
 caseSensitive: false
 ignoreRandomStrings: true
 words:
+  - lerp
   - nargs
   - noshiro
   - nums
