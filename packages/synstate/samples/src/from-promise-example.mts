@@ -9,7 +9,7 @@ if (import.meta.vitest !== undefined) {
     //  Timeline:
     //
     //  promise     [pending...]  -> resolved/rejected
-    //  data$                     Ok(value) or Err(error)
+    //  data$                        Ok(value) or Err(error)
     //
     //  Explanation:
     //  - fromPromise converts a Promise into an observable

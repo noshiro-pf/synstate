@@ -9,6 +9,11 @@ const refDir = path.resolve(workspaceRootPath, 'src/content/docs/reference');
 const jsdocMappings: DeepReadonly<
   [slug: string, srcPath: string, funcName: string][]
 > = [
+  [
+    'attach-index',
+    'src/core/predefined/operators/attach-index.mts',
+    'withIndex',
+  ],
   ['audit', 'src/core/operators/audit.mts', 'audit'],
   ['combine', 'src/core/combine/combine.mts', 'combine'],
   ['counter', 'src/core/create/counter.mts', 'counter'],
@@ -33,11 +38,29 @@ const jsdocMappings: DeepReadonly<
     'src/core/create/from-subscribable.mts',
     'fromSubscribable',
   ],
+  ['get-key', 'src/core/predefined/operators/pluck.mts', 'pluck'],
   ['map', 'src/core/operators/map.mts', 'map'],
+  [
+    'map-optional',
+    'src/core/predefined/operators/map-optional.mts',
+    'mapOptional',
+  ],
+  [
+    'map-result-err',
+    'src/core/predefined/operators/map-result-err.mts',
+    'mapResultErr',
+  ],
+  [
+    'map-result-ok',
+    'src/core/predefined/operators/map-result-ok.mts',
+    'mapResultOk',
+  ],
+  ['map-to', 'src/core/predefined/operators/map-to.mts', 'mapTo'],
   ['merge', 'src/core/combine/merge.mts', 'merge'],
   ['merge-map', 'src/core/operators/merge-map.mts', 'mergeMap'],
   ['pairwise', 'src/core/operators/pairwise.mts', 'pairwise'],
   ['scan', 'src/core/operators/scan.mts', 'scan'],
+  ['skip', 'src/core/predefined/operators/skip.mts', 'skip'],
   [
     'skip-if-no-change',
     'src/core/operators/skip-if-no-change.mts',
@@ -47,10 +70,26 @@ const jsdocMappings: DeepReadonly<
   ['skip-while', 'src/core/operators/skip-while.mts', 'skipWhile'],
   ['source', 'src/core/create/source.mts', 'source'],
   ['switch-map', 'src/core/operators/switch-map.mts', 'switchMap'],
+  ['take', 'src/core/predefined/operators/take.mts', 'take'],
   ['take-until', 'src/core/operators/take-until.mts', 'takeUntil'],
   ['take-while', 'src/core/operators/take-while.mts', 'takeWhile'],
   ['throttle', 'src/core/operators/throttle.mts', 'throttle'],
   ['timer', 'src/core/create/timer.mts', 'timer'],
+  [
+    'unwrap-optional',
+    'src/core/predefined/operators/unwrap-optional.mts',
+    'unwrapOptional',
+  ],
+  [
+    'unwrap-result-err',
+    'src/core/predefined/operators/unwrap-result-err.mts',
+    'unwrapResultErr',
+  ],
+  [
+    'unwrap-result-ok',
+    'src/core/predefined/operators/unwrap-result-ok.mts',
+    'unwrapResultOk',
+  ],
   [
     'with-buffered',
     'src/core/operators/with-buffered-from.mts',

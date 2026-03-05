@@ -6,9 +6,9 @@ if (import.meta.vitest !== undefined) {
 
     //  Timeline (300ms debounce):
     //
-    //  Time(ms)  0     100    200    300    400    500    600   ...   900   1000
-    //  input$    'h'   'he'   'hel'  'hello'
-    //  debounced$                                         'hello' (emitted after 300ms silence)
+    //  Time(ms)   0     100    200    300    400    500    600   ...   900   1000
+    //  input$     'h'   'he'   'hel'  'hello'
+    //  debounced$                                          'hello' (emitted after 300ms silence)
     //
     //  Explanation:
     //  - At 0ms: 'h' is emitted, timer starts
