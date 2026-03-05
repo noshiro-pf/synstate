@@ -50,7 +50,7 @@ export default defineConfig({
           autogenerate: { directory: 'examples' },
         },
         {
-          label: 'Reference',
+          label: 'API Reference',
           items: [
             { slug: 'reference/api' },
             {

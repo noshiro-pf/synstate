@@ -1,7 +1,7 @@
 ---
 prev: false
 next: false
-title: API Reference
+title: Index
 sidebar:
     order: 1
 ---
