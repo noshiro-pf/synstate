@@ -8,8 +8,8 @@ sidebar:
 
 <!-- jsdoc-description -->
 
-Creates a reactive state container with getter and setter methods.
-Provides a simple state management solution with observable state.
+Creates a reactive boolean state with convenient methods for boolean operations.
+Extends `createState` with boolean-specific helpers like `toggle`, `setTrue`, and `setFalse`.
 
 <!-- /jsdoc-description -->
 

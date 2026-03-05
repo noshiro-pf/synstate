@@ -119,10 +119,12 @@ const extractJsdocDescription = (
   sourceContent: string,
   funcName: string,
 ): string | undefined => {
-  // Match JSDoc block immediately before `export const funcName` or `export function funcName`
+  // Match JSDoc block immediately before `export const funcName` or `export function funcName`.
+  // Uses `(?:(?!/\*\*)[\s\S])*?` instead of `[\s\S]*?` to prevent matching across
+  // multiple JSDoc blocks when the same file contains several exported functions.
   // eslint-disable-next-line security/detect-non-literal-regexp
   const pattern = new RegExp(
-    String.raw`/\*\*([\s\S]*?)\*/\s*\n(?:export (?:const|function) ${funcName}\b)`,
+    String.raw`/\*\*((?:(?!/\*\*)[\s\S])*?)\*/\s*\n(?:export (?:const|function) ${funcName}\b)`,
     'u',
   );
 

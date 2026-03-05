@@ -8,7 +8,7 @@ sidebar:
 
 <!-- jsdoc-description -->
 
-Creates an event emitter for void events (events without payload).
+Creates an event emitter with typed payload.
 Returns a tuple of [observable, emitter function].
 
 <!-- /jsdoc-description -->
