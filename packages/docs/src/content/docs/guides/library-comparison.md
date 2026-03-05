@@ -8,18 +8,18 @@ This page provides an objective comparison of SynState with popular state manage
 
 ## Overview
 
-| Library            | Core Paradigm          | Derived Values         | Async Operators Built-in | Glitch-free              | Vanilla (No React)  | Maintenance |
-| ------------------ | ---------------------- | ---------------------- | ------------------------ | ------------------------ | ------------------- | ----------- |
-| **SynState**       | Observable (custom)    | Yes (operators)        | Yes                      | Yes (push-based)         | Yes                 | Active      |
-| **RxJS**           | Observable (ReactiveX) | Yes (operators)        | Yes                      | No                       | Yes                 | Active      |
-| **MobX**           | Proxy-based reactive   | Yes (`computed`)       | No                       | N/A (pull-based / lazy)  | Yes                 | Active      |
-| **Jotai**          | Atomic state           | Yes (derived atoms)    | Partial                  | N/A (pull-based / lazy)  | Yes (vanilla store) | Active      |
-| **Redux**          | Flux / single store    | Yes (selectors)        | No (middleware)          | N/A (pull-based)         | Yes                 | Active      |
-| **Zustand**        | Flux-inspired store    | No (inline selectors)  | No                       | N/A (pull-based)         | Yes                 | Active      |
-| **Valtio**         | Proxy-based mutable    | No (separate `derive`) | No                       | N/A (pull-based)         | Yes                 | Active      |
-| **Recoil**         | Atomic state (React)   | Yes (selectors)        | Partial                  | N/A (pull-based / lazy)  | No                  | Inactive    |
-| **XState**         | Finite state machines  | Via context            | No                       | N/A                      | Yes                 | Active      |
-| **TanStack Query** | Server-state cache     | N/A                    | Yes (fetch)              | N/A                      | Yes                 | Active      |
+| Library            | Core Paradigm          | Derived Values         | Async Operators Built-in | Glitch-free             | Vanilla (No React)  | Maintenance |
+| ------------------ | ---------------------- | ---------------------- | ------------------------ | ----------------------- | ------------------- | ----------- |
+| **SynState**       | Observable (custom)    | Yes (operators)        | Yes                      | Yes (push-based)        | Yes                 | Active      |
+| **RxJS**           | Observable (ReactiveX) | Yes (operators)        | Yes                      | No                      | Yes                 | Active      |
+| **MobX**           | Proxy-based reactive   | Yes (`computed`)       | No                       | N/A (pull-based / lazy) | Yes                 | Active      |
+| **Jotai**          | Atomic state           | Yes (derived atoms)    | Partial                  | N/A (pull-based / lazy) | Yes (vanilla store) | Active      |
+| **Redux**          | Flux / single store    | Yes (selectors)        | No (middleware)          | N/A (pull-based)        | Yes                 | Active      |
+| **Zustand**        | Flux-inspired store    | No (inline selectors)  | No                       | N/A (pull-based)        | Yes                 | Active      |
+| **Valtio**         | Proxy-based mutable    | No (separate `derive`) | No                       | N/A (pull-based)        | Yes                 | Active      |
+| **Recoil**         | Atomic state (React)   | Yes (selectors)        | Partial                  | N/A (pull-based / lazy) | No                  | Inactive    |
+| **XState**         | Finite state machines  | Via context            | No                       | N/A                     | Yes                 | Active      |
+| **TanStack Query** | Server-state cache     | N/A                    | Yes (fetch)              | N/A                     | Yes                 | Active      |
 
 :::note[Push-based vs Pull-based Glitch-Free]
 SynState is the only library in this list that achieves glitch-free propagation through **push-based topological sorting** — derived values are eagerly updated in dependency order, so subscribers always receive consistent values without needing to pull.
