@@ -37,6 +37,7 @@ const scenarios: readonly Scenario[] = [
       { name: 'Jotai', file: '01-derived-chain.jotai.mts' },
       { name: 'Redux', file: '01-derived-chain.redux.mts' },
       { name: 'Zustand', file: '01-derived-chain.zustand.mts' },
+      { name: 'Valtio', file: '01-derived-chain.valtio.mts' },
     ],
   },
   {

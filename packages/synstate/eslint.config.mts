@@ -38,6 +38,7 @@ export default [
             ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
             'zustand/vanilla',
             'jotai/vanilla',
+            'valtio/vanilla',
           ],
         },
       ],

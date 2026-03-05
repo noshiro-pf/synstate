@@ -25,12 +25,13 @@ counter (initial: 0)
 
 | Library  | Median (ms) | Min (ms) | Max (ms) | p95 (ms) |    Ops/sec |
 | -------- | ----------: | -------: | -------: | -------: | ---------: |
-| SynState |       12.31 |     8.58 |    22.67 |    18.46 |  8,124,261 |
-| RxJS     |        3.14 |     3.04 |     3.65 |     3.62 | 31,892,352 |
-| MobX     |       71.03 |    69.96 |    74.63 |    74.26 |  1,407,793 |
-| Jotai    |      357.19 |   337.60 |   385.56 |   376.98 |    279,962 |
-| Redux    |      177.54 |   162.35 |   212.60 |   201.96 |    563,247 |
-| Zustand  |        2.83 |     2.75 |     3.10 |     3.06 | 35,378,255 |
+| SynState |       13.39 |    10.28 |    20.04 |    19.62 |  7,465,632 |
+| RxJS     |        3.79 |     3.67 |     4.12 |     4.11 | 26,392,839 |
+| MobX     |       89.36 |    88.48 |    90.74 |    90.14 |  1,119,054 |
+| Jotai    |      392.07 |   374.80 |   426.35 |   420.00 |    255,059 |
+| Redux    |      202.22 |   191.80 |   251.83 |   242.93 |    494,500 |
+| Zustand  |        2.96 |     2.86 |     3.74 |     3.38 | 33,751,925 |
+| Valtio   |       22.04 |    21.25 |    22.82 |    22.82 |  4,537,372 |
 
 <!-- /benchmark-result -->
 
@@ -227,6 +228,30 @@ export const runBenchmark = (n: number): number => {
 };
 ```
 
+#### Valtio
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const state = proxy({ counter: 0 });
+    let mut_lastValue = state.counter * 2 * 2;
+
+    const unsubscribe = subscribe(
+        state,
+        () => {
+            mut_lastValue = state.counter * 2 * 2;
+        },
+        true,
+    );
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        state.counter = mut_i;
+    }
+
+    unsubscribe();
+    return mut_lastValue;
+};
+```
+
 ## Scenario: Diamond Dependency
 
 A diamond-shaped dependency graph that tests how each library handles multiple derived values merging back into one:
@@ -253,11 +278,11 @@ RxJS `combineLatest` fires the subscriber **twice per update** in this diamond g
 
 | Library  | Median (ms) | Min (ms) | Max (ms) | p95 (ms) |    Ops/sec |
 | -------- | ----------: | -------: | -------: | -------: | ---------: |
-| SynState |       17.87 |    16.34 |    24.15 |    22.17 |  5,594,889 |
-| RxJS     |        8.79 |     8.28 |     9.07 |     9.04 | 11,376,138 |
-| MobX     |       90.47 |    87.59 |    93.67 |    93.24 |  1,105,338 |
-| Jotai    |      518.86 |   499.54 |   558.17 |   554.99 |    192,729 |
-| Redux    |      274.75 |   248.75 |   299.42 |   292.66 |    363,964 |
+| SynState |       19.54 |    17.93 |    25.79 |    22.63 |  5,118,062 |
+| RxJS     |        9.31 |     8.86 |     9.68 |     9.57 | 10,737,673 |
+| MobX     |       99.90 |    98.57 |   101.49 |   101.28 |  1,000,966 |
+| Jotai    |      550.21 |   543.65 |   560.05 |   557.63 |    181,750 |
+| Redux    |      317.42 |   289.68 |   362.50 |   339.75 |    315,041 |
 
 <!-- /benchmark-result-diamond -->
 
@@ -448,6 +473,7 @@ export const runBenchmark = (n: number): number => {
 
 - **Redux**: Default middleware (thunk, serializable check, immutability check) is disabled via `middleware: () => new Tuple()`. These are development-time checks that are tree-shaken in production builds.
 - **Zustand** (Derived Chain only): Derived values are computed inline in the selector (`counter * 2 * 2`) since Zustand does not have a separate derived-value primitive. Zustand is excluded from the Diamond Dependency scenario for the same reason — there is no mechanism to define independent derived values and combine them.
+- **Valtio** (Derived Chain only): Like Zustand, derived values are computed inline inside the `subscribe` callback (`state.counter * 2 * 2`) since Valtio's `derive` utility is a separate package and the vanilla API does not provide a built-in derived-value primitive. The third argument `true` enables synchronous notification so that the subscriber fires on every mutation (Valtio batches asynchronously by default). Valtio is excluded from the Diamond Dependency scenario for the same reason.
 - **RxJS** (Diamond Dependency): `combineLatest` fires the subscriber twice per source update due to the [glitch problem](/synstate/guides/how-synstate-solved-the-glitch/). The benchmark measures wall-clock time including this extra work, which reflects the real-world cost of diamond dependencies in RxJS.
 - **MobX**: `reaction` is used instead of `autorun` to match other libraries' subscribe-and-record pattern. `runInAction` wraps each mutation as required by MobX strict mode.
 - **Jotai**: `store.sub()` does not pass the current value to the callback, so an additional `store.get()` call is made inside the listener. The initial value is also read via `store.get()` before subscribing.

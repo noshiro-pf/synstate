@@ -12,6 +12,7 @@ words:
   - testw
   - tscw
   - unsub
+  - valtio
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml

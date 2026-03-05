@@ -164,6 +164,7 @@ const documents: DeepReadonly<
       '01-derived-chain.jotai.mts',
       '01-derived-chain.redux.mts',
       '01-derived-chain.zustand.mts',
+      '01-derived-chain.valtio.mts',
       '02-diamond-dependency.synstate.mts',
       '02-diamond-dependency.rxjs.mts',
       '02-diamond-dependency.mobx.mts',
