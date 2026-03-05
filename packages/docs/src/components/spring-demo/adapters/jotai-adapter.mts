@@ -16,7 +16,10 @@ export const createJotaiSpringAdapter = (): SpringAdapter => {
   return {
     name: 'Jotai',
     setup: (chainDepth, { onEmit }) => {
-      const startPos: Point = { x: CANVAS_WIDTH / 2, y: CANVAS_HEIGHT / 2 };
+      const startPos: Point = {
+        x: CANVAS_WIDTH / 2,
+        y: CANVAS_HEIGHT / 2,
+      } as const;
 
       mut_store = createStore();
 

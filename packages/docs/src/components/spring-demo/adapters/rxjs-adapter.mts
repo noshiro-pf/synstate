@@ -18,7 +18,10 @@ export const createRxJSSpringAdapter = (): SpringAdapter => {
   return {
     name: 'RxJS',
     setup: (chainDepth, { onEmit }) => {
-      const startPos: Point = { x: CANVAS_WIDTH / 2, y: CANVAS_HEIGHT / 2 };
+      const startPos: Point = {
+        x: CANVAS_WIDTH / 2,
+        y: CANVAS_HEIGHT / 2,
+      } as const;
 
       mut_mousePos$ = new BehaviorSubject<Point>(startPos);
 
