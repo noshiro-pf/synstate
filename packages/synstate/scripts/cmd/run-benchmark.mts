@@ -31,7 +31,7 @@ const scenarios: readonly Scenario[] = [
     expectedValue: N * 4,
     resultsFile: 'results.md',
     entries: [
-      { name: 'SynState', file: '01-derived-chain.synstate.mts' },
+      { name: '**SynState**', file: '01-derived-chain.synstate.mts' },
       { name: 'RxJS', file: '01-derived-chain.rxjs.mts' },
       { name: 'MobX', file: '01-derived-chain.mobx.mts' },
       { name: 'Jotai', file: '01-derived-chain.jotai.mts' },
@@ -45,7 +45,7 @@ const scenarios: readonly Scenario[] = [
     expectedValue: N * 5,
     resultsFile: 'results-diamond.md',
     entries: [
-      { name: 'SynState', file: '02-diamond-dependency.synstate.mts' },
+      { name: '**SynState**', file: '02-diamond-dependency.synstate.mts' },
       { name: 'RxJS', file: '02-diamond-dependency.rxjs.mts' },
       { name: 'MobX', file: '02-diamond-dependency.mobx.mts' },
       { name: 'Jotai', file: '02-diamond-dependency.jotai.mts' },

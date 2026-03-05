@@ -247,6 +247,147 @@ await new Promise<void>((resolve) => {
 assert.deepStrictEqual(valueHistory, [0, 1001, 2002, 3003, 4004]);
 ```
 
+### How Jotai's Store Works Internally
+
+Understanding how Jotai avoids glitches requires looking at the internal data structures and the flow of `store.set()`.
+
+#### Data Structures
+
+Jotai's store maintains several `WeakMap`-based maps to manage atom state:
+
+- **`atomStateMap: WeakMap<Atom, AtomState>`** — stores each atom's current value, error, epoch number, and dependencies
+- **`mountedMap: WeakMap<Atom, Mounted>`** — tracks subscribed ("mounted") atoms with their listeners, dependencies, and dependents
+- **`invalidatedAtoms: WeakMap<Atom, EpochNumber>`** — marks which atoms need recomputation
+
+Each `AtomState` holds:
+
+```ts
+type AtomState = {
+    d: Map<Atom, EpochNumber>; // dependencies → epoch when last read
+    n: EpochNumber; // current epoch (incremented on value change)
+    v?: Value; // current value
+    e?: Error; // current error
+};
+```
+
+Each `Mounted` record holds:
+
+```ts
+type Mounted = {
+    l: Set<() => void>; // listener callbacks (from store.sub)
+    d: Set<Atom>; // mounted dependencies
+    t: Set<Atom>; // mounted dependenTs (reverse links)
+};
+```
+
+When `store.sub(sumAtom, listener)` is called, Jotai recursively mounts the entire dependency tree (`counterAtom`, `multipliedAtom`, `sumAtom`), establishing bidirectional dependency links in the `Mounted` records.
+
+#### What Happens on Each `store.set()` Call
+
+When `store.set(counterAtom, newValue)` is called, the following sequence occurs:
+
+```ts
+storeSet(store, atom, ...args) {
+  try {
+    writeAtomState(store, atom, ...args)
+  } finally {
+    recomputeInvalidatedAtoms(store)  // Phase 2
+    flushCallbacks(store)              // Phase 3
+  }
+}
+```
+
+**Phase 1 — Write + Invalidate**
+
+`writeAtomState` updates `counterAtom`'s value in the `atomStateMap`, increments its epoch number, and then calls `invalidateDependents`. This walks the mounted dependency graph (`counterAtom → multipliedAtom → sumAtom`) using the `Mounted.t` (dependents) links, marking each dependent in `invalidatedAtoms`.
+
+**Phase 2 — Recompute (Topological Sort + Pull)**
+
+`recomputeInvalidatedAtoms` builds a **topologically sorted list** of all invalidated atoms by performing a DFS traversal from `changedAtoms` through the mounted dependent graph. It then processes atoms in reverse topological order (leaves first).
+
+For each invalidated atom, it calls `readAtomState`, which is the core pull-based mechanism:
+
+```ts
+// Simplified readAtomState for a derived atom
+function readAtomState(store, atom) {
+    const atomState = atomStateMap.get(atom);
+
+    // Early return if mounted and not invalidated
+    if (mountedMap.has(atom) && invalidatedAtoms.get(atom) !== atomState.n) {
+        return atomState;
+    }
+
+    // Check if any dependency actually changed
+    for (const [dep, epochWhenRead] of atomState.d) {
+        if (readAtomState(store, dep).n !== epochWhenRead) {
+            // Dependency changed — must recompute
+            break;
+        }
+    }
+
+    // Create a getter that tracks dependencies
+    const getter = (a) => {
+        const aState = readAtomState(store, a);
+        nextDeps.set(a, aState.n); // record dependency + epoch
+        return aState.v;
+    };
+
+    // Execute the user's read function
+    const newValue = atom.read(getter); // e.g., (get) => get(multipliedAtom) + get(counterAtom)
+
+    // Update value and epoch if changed
+    if (!Object.is(atomState.v, newValue)) {
+        atomState.v = newValue;
+        atomState.n++;
+    }
+}
+```
+
+This is where glitches are avoided: when `sumAtom` is recomputed, its `read` function calls `getter(multipliedAtom)`, which recursively triggers `readAtomState(multipliedAtom)`. Since `multipliedAtom` was already recomputed earlier in the topological order (or is recomputed now on-demand), `sumAtom` always sees the up-to-date value. The dependency chain is resolved by pulling — not by pushing intermediate values.
+
+**Phase 3 — Flush Callbacks**
+
+`flushCallbacks` collects listener callbacks from all atoms in `changedAtoms` (by looking up `mountedMap.get(atom).l`) and invokes them. The listener then calls `store.get(sumAtom)`, which enters `readAtomState` again — but this time the atom is already up-to-date, so it returns immediately.
+
+#### Why This Approach Is Significantly Slower
+
+In the [performance benchmark](/synstate/guides/benchmark/), the Derived Chain scenario (100,000 synchronous `store.set()` calls through a 3-atom chain) shows Jotai at ~390ms, while RxJS achieves ~3ms and SynState ~13ms. The overhead comes from several compounding factors:
+
+**1. WeakMap Lookups Per Update (~30–40 times)**
+
+Almost every internal function begins by looking up the store's building blocks from a `WeakMap`, then looking up atom state from another `WeakMap`. A single `store.set()` call for a 3-atom chain involves approximately 30–40 `WeakMap` lookups: `atomStateMap.get()`, `mountedMap.get()`, `invalidatedAtoms.get()`, and `getInternalBuildingBlocks()` for each phase and each atom. Over 100,000 iterations, this totals **3–4 million WeakMap lookups**. In contrast, RxJS performs zero map lookups per update — the pipe chain is a direct function call chain established once at subscription time.
+
+**2. Object Allocations Per Update (~15–20 objects)**
+
+Each `store.set()` call creates: 2 closures in `writeAtomState` (getter/setter), 2 closures in each `readAtomState` call (getter + options), temporary `Map`/`Set` objects for dependency tracking (`prevDeps`, `nextDeps`), arrays and `WeakSet`s for the topological sort, and a `Set` for collecting callbacks. Over 100,000 iterations, this produces approximately **1.5–2 million short-lived object allocations**, putting significant pressure on the garbage collector. RxJS and SynState allocate zero objects per update in this scenario.
+
+**3. Topological Sort Per Update**
+
+Even for a simple 3-atom linear chain, `recomputeInvalidatedAtoms` performs a full DFS traversal to build a topologically sorted list. This involves creating temporary arrays and `WeakSet`s, iterating the dependency graph, and reversing the result. While the cost for 3 atoms is small in absolute terms, repeating this 100,000 times adds up. Push-based systems like RxJS and SynState establish the propagation order once at subscription time and reuse it for every update.
+
+**4. Dynamic Dependency Rebuilding**
+
+Every time `readAtomState` calls the user's `read` function, it rebuilds the dependency map from scratch. The `getter` closure records each accessed atom in `nextDeps`, and after the read completes, stale dependencies are pruned by diffing `prevDeps` and `nextDeps`. This is necessary because Jotai supports dynamic dependencies (the set of dependencies can change based on values), but in a static chain like the benchmark, it is pure overhead. Push-based systems wire up the dependency graph once.
+
+**5. Subscriber Double-Read**
+
+Jotai's `store.sub()` callback receives no arguments — it is only a notification that something changed. The subscriber must call `store.get(atom)` to retrieve the new value, which re-enters `readAtomState`. While this call is cheap (the atom is already up-to-date, so it returns early), it still involves WeakMap lookups and function calls. Push-based systems deliver the value directly to the subscriber as an argument.
+
+**Summary: Cost Comparison Per `store.set()` Call**
+
+| Cost Factor                |                   RxJS |               SynState |                         Jotai |
+| -------------------------- | ---------------------: | ---------------------: | ----------------------------: |
+| Map/WeakMap lookups        |                      0 |                   ~2–4 |                        ~30–40 |
+| Object allocations         |                      0 |                      0 |                        ~15–20 |
+| Function calls             |                   ~4–6 |                  ~6–10 |                        ~60–80 |
+| Dependency graph traversal |                   None |   Depth-based ordering |   Full DFS + topological sort |
+| Dependency tracking        |    Static (wired once) |    Static (wired once) |  Dynamic (rebuilt every read) |
+| Value delivery             | Push (direct argument) | Push (direct argument) | Pull (notification + re-read) |
+
+:::note
+Jotai's architecture is not "wrong" — it is optimized for React rendering, not raw synchronous throughput. Pull-based evaluation avoids recomputing atoms that no component is rendering. Dynamic dependency tracking enables powerful patterns like conditional `get()` calls. WeakMap-based storage provides automatic garbage collection. The 100,000 synchronous updates benchmark is an adversarial workload for this architecture; in a typical React application with a few dozen state updates per second, Jotai's overhead is negligible.
+:::
+
 ## What Happens in Redux / Zustand (No Diamond Dependency)
 
 Redux and Zustand use a **single immutable state tree**. Derived values are not computed through a propagation graph but through **selector functions** — pure functions that take the current state snapshot and return a derived value.
