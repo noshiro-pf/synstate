@@ -1,5 +1,6 @@
 import { BehaviorSubject, map } from 'rxjs';
 
+// embed-sample-code-ignore-above
 export const runBenchmark = (n: number): number => {
   const counter = new BehaviorSubject(0);
 
@@ -21,6 +22,7 @@ export const runBenchmark = (n: number): number => {
 
   return mut_lastValue;
 };
+// embed-sample-code-ignore-below
 
 if (import.meta.vitest !== undefined) {
   test('derived-chain benchmark (RxJS)', () => {

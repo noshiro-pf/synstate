@@ -5,6 +5,7 @@ import {
   createSlice,
 } from '@reduxjs/toolkit';
 
+// embed-sample-code-ignore-above
 export const runBenchmark = (n: number): number => {
   const counterSlice = createSlice({
     name: 'counter',
@@ -44,6 +45,7 @@ export const runBenchmark = (n: number): number => {
 
   return mut_lastValue;
 };
+// embed-sample-code-ignore-below
 
 if (import.meta.vitest !== undefined) {
   test('derived-chain benchmark (Redux)', () => {

@@ -151,6 +151,21 @@ const documents: DeepReadonly<
       '01-simple-glitch-example.zustand.mts',
     ],
   },
+  {
+    mdPath: path.resolve(
+      workspaceRootPath,
+      'src/content/docs/guides/benchmark.md',
+    ),
+    samplesDir: path.resolve(synstateSamplesRoot, 'docs-site/benchmark'),
+    sampleCodeFiles: [
+      '01-derived-chain.synstate.mts',
+      '01-derived-chain.rxjs.mts',
+      '01-derived-chain.mobx.mts',
+      '01-derived-chain.jotai.mts',
+      '01-derived-chain.redux.mts',
+      '01-derived-chain.zustand.mts',
+    ],
+  },
   ...referenceDocuments,
 ] as const;
 

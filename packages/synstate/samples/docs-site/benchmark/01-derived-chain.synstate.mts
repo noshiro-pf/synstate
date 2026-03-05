@@ -1,5 +1,6 @@
 import { createState, map } from 'synstate';
 
+// embed-sample-code-ignore-above
 export const runBenchmark = (n: number): number => {
   const [counter, setCounter] = createState(0);
 
@@ -21,6 +22,7 @@ export const runBenchmark = (n: number): number => {
 
   return mut_lastValue;
 };
+// embed-sample-code-ignore-below
 
 if (import.meta.vitest !== undefined) {
   test('derived-chain benchmark (synstate)', () => {

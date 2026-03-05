@@ -93,14 +93,12 @@ const run = async (): Promise<void> => {
 
   console.log('');
 
-  // Print results as Markdown table
-  console.log(
+  // Build Markdown table
+  const mut_tableLines: string[] = [
     '| Library  | Median (ms) | Min (ms) | Max (ms) | p95 (ms) | Ops/sec   |',
-  );
 
-  console.log(
     '| -------- | ----------: | -------: | -------: | -------: | --------: |',
-  );
+  ];
 
   for (const { name, times } of mut_results) {
     const sorted = times.toSorted((a, b) => a - b);
@@ -116,10 +114,22 @@ const run = async (): Promise<void> => {
     // eslint-disable-next-line total-functions/no-partial-division
     const opsPerSec = Math.round(N / (med / 1000));
 
-    console.log(
+    mut_tableLines.push(
       `| ${name.padEnd(8)} | ${med.toFixed(2).padStart(11)} | ${min.toFixed(2).padStart(8)} | ${max.toFixed(2).padStart(8)} | ${p95Val.toFixed(2).padStart(8)} | ${formatNumber(opsPerSec).padStart(9)} |`,
     );
   }
+
+  const tableContent = mut_tableLines.join('\n');
+
+  // Print to console
+  console.log(tableContent);
+
+  // Write to file for docs embedding
+  const resultsPath = path.resolve(benchmarkDir, 'results.md');
+
+  await fs.writeFile(resultsPath, `${tableContent}\n`, 'utf8');
+
+  console.log(`\n✓ Results written to ${resultsPath}`);
 };
 
 await run();
