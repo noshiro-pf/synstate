@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { asSafeUint } from 'ts-data-forge';
 import {
   createJotaiSpringAdapter,
   createRxJSSpringAdapter,
@@ -7,11 +8,15 @@ import {
 import { SnakeCanvas } from './snake-canvas.js';
 
 const DEFAULT_CHAIN_DEPTH = 50;
+
 const MIN_DEPTH = 10;
+
 const MAX_DEPTH = 500;
 
 export const SpringDemo: React.FC = () => {
-  const [chainDepth, setChainDepth] = useState(DEFAULT_CHAIN_DEPTH);
+  const [chainDepth, setChainDepth] = useState<SafeUint>(
+    asSafeUint(DEFAULT_CHAIN_DEPTH),
+  );
 
   const adapters = useMemo(
     () => [
@@ -25,7 +30,7 @@ export const SpringDemo: React.FC = () => {
   const handleDepthChange = useCallback(
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setChainDepth(Number(e.target.value));
+      setChainDepth(asSafeUint(Number(e.target.value)));
     },
     [],
   );
