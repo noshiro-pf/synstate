@@ -1,0 +1,54 @@
+---
+title: Interactive Glitch Demo
+sidebar:
+    order: 6
+---
+
+import { GlitchDemo } from '../../../components/glitch-demo/glitch-demo';
+
+## See the Diamond Dependency Glitch in Action
+
+When two derived values depend on the same source (a **diamond dependency**), some reactive libraries emit inconsistent intermediate states — known as **glitches**. This demo lets you see the difference with your own eyes.
+
+### How it works
+
+All three canvases share the same mouse coordinates. Each library builds the same **diamond dependency graph**:
+
+```
+mousePos (source)
+  ├── topLeft  = map(pos => min of start and current)
+  ├── size     = map(pos => abs difference)
+  └── combine([topLeft, size])
+        └── draw rectangle + check consistency
+```
+
+Each emitted rectangle is drawn as a semi-transparent overlay:
+
+- **Blue** — the emitted rect matches the expected rect (consistent)
+- **Red** — the emitted rect does NOT match (glitch: one branch updated, the other didn't yet)
+
+<GlitchDemo client:only="react" />
+
+### What to look for
+
+| Library      | Glitches | Performance | Why                                                                                                           |
+| ------------ | -------- | ----------- | ------------------------------------------------------------------------------------------------------------- |
+| **SynState** | 0        | Fast        | Depth-based topological update — all branches resolve atomically before notifying subscribers                 |
+| **RxJS**     | Many     | Fast        | `combineLatest` fires on each input change, so `topLeft` updates before `size` causing intermediate emissions |
+| **Jotai**    | 0        | Slower      | Pull-based derivation ensures consistency, but re-computation overhead is higher per update                   |
+
+### Why this matters
+
+In real applications, diamond dependencies appear everywhere — computed styles from shared state, derived UI values, form validations. Glitches cause:
+
+- **Visual flicker** — UI renders an impossible intermediate state
+- **Wasted renders** — extra emissions trigger unnecessary work
+- **Logic bugs** — side effects fire with inconsistent data
+
+SynState eliminates these problems at the library level, with no manual workarounds needed.
+
+### Related
+
+- [How SynState Solved the Glitch](/synstate/guides/how-synstate-solved-the-glitch/)
+- [Performance Benchmark](/synstate/guides/benchmark/)
+- [Library Comparison](/synstate/guides/library-comparison/)

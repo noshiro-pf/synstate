@@ -1,3 +1,4 @@
+import react from '@astrojs/react';
 import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
 
@@ -5,6 +6,7 @@ export default defineConfig({
   site: 'https://noshiro-pf.github.io',
   base: '/synstate/',
   integrations: [
+    react(),
     starlight({
       title: 'SynState',
       favicon: '/favicon/favicon.ico',

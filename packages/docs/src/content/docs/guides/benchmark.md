@@ -233,6 +233,7 @@ export const runBenchmark = (n: number): number => {
 ```tsx
 export const runBenchmark = (n: number): number => {
     const state = proxy({ counter: 0 });
+
     let mut_lastValue = state.counter * 2 * 2;
 
     const unsubscribe = subscribe(
@@ -248,6 +249,7 @@ export const runBenchmark = (n: number): number => {
     }
 
     unsubscribe();
+
     return mut_lastValue;
 };
 ```
