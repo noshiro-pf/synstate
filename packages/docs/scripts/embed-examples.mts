@@ -61,7 +61,7 @@ const referencePageSamples: DeepReadonly<[slug: string, sampleFile: string][]> =
     ['with-current-value-from', 'with-current-value-from-example.mts'],
     ['with-initial-value', 'with-initial-value-example.mts'],
     ['zip', 'zip-example.mts'],
-  ];
+  ] as const;
 
 const referenceDocuments: DeepReadonly<
   {

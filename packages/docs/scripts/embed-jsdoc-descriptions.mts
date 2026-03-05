@@ -106,7 +106,7 @@ const jsdocMappings: DeepReadonly<
     'withInitialValue',
   ],
   ['zip', 'src/core/combine/zip.mts', 'zip'],
-];
+] as const;
 
 const placeholderStart = '<!-- jsdoc-description -->';
 

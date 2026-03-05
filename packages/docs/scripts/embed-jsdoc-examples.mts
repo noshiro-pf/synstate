@@ -128,7 +128,7 @@ const jsdocExampleMappings: DeepReadonly<
     'with-initial-value-example.mts',
   ],
   ['src/core/combine/zip.mts', 'zip', 'zip-example.mts'],
-];
+] as const;
 
 /**
  * Formats extracted sample code for embedding inside a JSDoc `@example` code block.
@@ -185,7 +185,7 @@ const replaceJsdocExample = (
 
   const newJsdocBlock = `${
     jsdocBlock.slice(0, contentStart) + formattedCode
-  }\n${jsdocBlock.slice(endIdx)}`;
+  }\n${jsdocBlock.slice(endIdx)}` as const;
 
   return (
     sourceContent.slice(0, jsdocStartPos) +
