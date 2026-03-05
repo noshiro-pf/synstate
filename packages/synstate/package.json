@@ -28,6 +28,7 @@
     "LICENSE"
   ],
   "scripts": {
+    "benchmark": "tsx ./scripts/cmd/run-benchmark.mts",
     "build": "tsx ./scripts/cmd/build.mts",
     "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
     "check:ext": "tsx ./scripts/cmd/check-ext.mts",
