@@ -28,7 +28,7 @@ const targets: readonly EmbedTarget[] = [
     startMarker: '<!-- benchmark-result-diamond -->',
     endMarker: '<!-- /benchmark-result-diamond -->',
   },
-];
+] as const;
 
 const embedBenchmark = async (): Promise<void> => {
   let mut_markdown = await fs.readFile(targetMarkdownFile, 'utf8');

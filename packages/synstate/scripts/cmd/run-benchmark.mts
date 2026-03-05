@@ -51,7 +51,7 @@ const scenarios: readonly Scenario[] = [
       { name: 'Redux', file: '02-diamond-dependency.redux.mts' },
     ],
   },
-];
+] as const;
 
 const benchmarkDir = path.resolve(
   workspaceRootPath,
