@@ -5,6 +5,7 @@ export const runBenchmark = (n: number): number => {
   const counterAtom = atom(0);
 
   const doubledAtom = atom((get) => get(counterAtom) * 2);
+
   const tripledAtom = atom((get) => get(counterAtom) * 3);
 
   const sumAtom = atom((get) => get(doubledAtom) + get(tripledAtom));

@@ -270,6 +270,7 @@ export const runBenchmark = (n: number): number => {
     const [counter, setCounter] = createState(0);
 
     const doubled = counter.pipe(map((x) => x * 2));
+
     const tripled = counter.pipe(map((x) => x * 3));
 
     const sum = combine([doubled, tripled]).pipe(map(([d, t]) => d + t));
@@ -297,6 +298,7 @@ export const runBenchmark = (n: number): number => {
     const counter = new BehaviorSubject(0);
 
     const doubled = counter.pipe(map((x) => x * 2));
+
     const tripled = counter.pipe(map((x) => x * 3));
 
     const sum = combineLatest([doubled, tripled]).pipe(map(([d, t]) => d + t));
@@ -324,6 +326,7 @@ export const runBenchmark = (n: number): number => {
     const state = observable({ counter: 0 });
 
     const doubled = computed(() => state.counter * 2);
+
     const tripled = computed(() => state.counter * 3);
 
     const sum = computed(() => doubled.get() + tripled.get());
@@ -357,6 +360,7 @@ export const runBenchmark = (n: number): number => {
     const counterAtom = atom(0);
 
     const doubledAtom = atom((get) => get(counterAtom) * 2);
+
     const tripledAtom = atom((get) => get(counterAtom) * 3);
 
     const sumAtom = atom((get) => get(doubledAtom) + get(tripledAtom));
@@ -406,6 +410,7 @@ export const runBenchmark = (n: number): number => {
         selectCounter,
         (counter) => counter * 2,
     );
+
     const selectTripled = createSelector(
         selectCounter,
         (counter) => counter * 3,

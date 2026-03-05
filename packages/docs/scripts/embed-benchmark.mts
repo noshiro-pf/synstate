@@ -49,7 +49,7 @@ const embedBenchmark = async (): Promise<void> => {
       continue;
     }
 
-    const results = (await fs.readFile(resultsPath, 'utf8')).trim();
+    const results = await fs.readFile(resultsPath, 'utf8');
 
     const startIndex = mut_markdown.indexOf(startMarker);
 
@@ -70,7 +70,7 @@ const embedBenchmark = async (): Promise<void> => {
 
     const after = mut_markdown.slice(Math.max(0, endIndex));
 
-    mut_markdown = `${before}\n${results}\n${after}`;
+    mut_markdown = `${before}\n${results.trim()}\n${after}`;
 
     console.log(`✓ Embedded ${resultsFile} into benchmark.md`);
   }

@@ -5,6 +5,7 @@ export const runBenchmark = (n: number): number => {
   const [counter, setCounter] = createState(0);
 
   const doubled = counter.pipe(map((x) => x * 2));
+
   const tripled = counter.pipe(map((x) => x * 3));
 
   const sum = combine([doubled, tripled]).pipe(map(([d, t]) => d + t));

@@ -5,6 +5,7 @@ export const runBenchmark = (n: number): number => {
   const state = observable({ counter: 0 });
 
   const doubled = computed(() => state.counter * 2);
+
   const tripled = computed(() => state.counter * 3);
 
   const sum = computed(() => doubled.get() + tripled.get());

@@ -27,6 +27,7 @@ export const runBenchmark = (n: number): number => {
     state.value;
 
   const selectDoubled = createSelector(selectCounter, (counter) => counter * 2);
+
   const selectTripled = createSelector(selectCounter, (counter) => counter * 3);
 
   const selectSum = createSelector(
