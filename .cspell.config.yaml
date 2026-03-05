@@ -11,6 +11,7 @@ words:
   - synstate
   - testw
   - tscw
+  - unsub
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml
