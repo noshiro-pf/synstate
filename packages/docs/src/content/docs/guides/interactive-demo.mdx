@@ -12,30 +12,30 @@ When two derived values depend on the same source (a **diamond dependency**), so
 
 ### How it works
 
-All three canvases share the same mouse coordinates. Each library builds the same **diamond dependency graph**:
+Click and drag on each canvas to draw a trail. Each dot is placed by the library's reactive pipeline using the same **diamond dependency graph**:
 
 ```
-mousePos (source)
-  ├── topLeft  = map(pos => min of start and current)
-  ├── size     = map(pos => abs difference)
-  └── combine([topLeft, size])
-        └── draw rectangle + check consistency
+mousePos (source: {x, y})
+  ├── derivedX = map(pos => pos.x)
+  ├── derivedY = map(pos => pos.y)
+  └── combine([derivedX, derivedY])
+        └── draw dot at {x, y} + check consistency
 ```
 
-Each emitted rectangle is drawn as a semi-transparent overlay:
+Each emitted position is compared to the latest mouse position:
 
-- **Blue** — the emitted rect matches the expected rect (consistent)
-- **Red** — the emitted rect does NOT match (glitch: one branch updated, the other didn't yet)
+- **Blue dot** — emitted `(x, y)` matches the actual mouse position (consistent)
+- **Red dot** — one axis updated but the other didn't yet (glitch — the dot appears off the drag path)
 
 <GlitchDemo client:only="react" />
 
 ### What to look for
 
-| Library      | Glitches | Performance | Why                                                                                                           |
-| ------------ | -------- | ----------- | ------------------------------------------------------------------------------------------------------------- |
-| **SynState** | 0        | Fast        | Depth-based topological update — all branches resolve atomically before notifying subscribers                 |
-| **RxJS**     | Many     | Fast        | `combineLatest` fires on each input change, so `topLeft` updates before `size` causing intermediate emissions |
-| **Jotai**    | 0        | Slower      | Pull-based derivation ensures consistency, but re-computation overhead is higher per update                   |
+| Library      | Glitches | Performance | Why                                                                                                                                |
+| ------------ | -------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **SynState** | 0        | Fast        | Depth-based topological update — all branches resolve atomically before notifying subscribers                                      |
+| **RxJS**     | Many     | Fast        | `combineLatest` fires on each input change, so `derivedX` updates before `derivedY` causing intermediate emissions with stale data |
+| **Jotai**    | 0        | Slower      | Pull-based derivation ensures consistency, but re-computation overhead is higher per update                                        |
 
 ### Why this matters
 

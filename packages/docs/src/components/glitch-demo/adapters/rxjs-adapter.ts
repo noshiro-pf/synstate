@@ -8,28 +8,18 @@ export const createRxJSAdapter = (): Adapter => {
 
   return {
     name: 'RxJS',
-    setup: (startPos, { onEmit }) => {
-      mut_mousePos$ = new BehaviorSubject<Point>(startPos);
+    setup: ({ onEmit }) => {
+      mut_mousePos$ = new BehaviorSubject<Point>({ x: -1, y: -1 });
 
-      const topLeft$ = mut_mousePos$.pipe(
-        map((pos) => ({
-          x: Math.min(startPos.x, pos.x),
-          y: Math.min(startPos.y, pos.y),
-        })),
+      const derivedX$ = mut_mousePos$.pipe(map((pos) => pos.x));
+
+      const derivedY$ = mut_mousePos$.pipe(map((pos) => pos.y));
+
+      const combined$ = combineLatest([derivedX$, derivedY$]).pipe(
+        map(([x, y]) => ({ x, y })),
       );
 
-      const size$ = mut_mousePos$.pipe(
-        map((pos) => ({
-          width: Math.abs(pos.x - startPos.x),
-          height: Math.abs(pos.y - startPos.y),
-        })),
-      );
-
-      const rect$ = combineLatest([topLeft$, size$]).pipe(
-        map(([tl, sz]) => ({ ...tl, ...sz })),
-      );
-
-      mut_subscription = rect$.subscribe(onEmit);
+      mut_subscription = combined$.subscribe(onEmit);
     },
     onMouseMove: (pos) => {
       mut_mousePos$?.next(pos);

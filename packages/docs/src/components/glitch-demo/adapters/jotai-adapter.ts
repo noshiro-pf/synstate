@@ -11,39 +11,25 @@ export const createJotaiAdapter = (): Adapter => {
 
   return {
     name: 'Jotai',
-    setup: (startPos, { onEmit }) => {
+    setup: ({ onEmit }) => {
       mut_store = createStore();
 
-      mut_mousePosAtom = atom<Point>(startPos);
+      mut_mousePosAtom = atom<Point>({ x: -1, y: -1 });
 
-      const topLeftAtom = atom((get) => {
-        const pos = get(mut_mousePosAtom!);
+      const derivedXAtom = atom((get) => get(mut_mousePosAtom!).x);
 
-        return {
-          x: Math.min(startPos.x, pos.x),
-          y: Math.min(startPos.y, pos.y),
-        };
-      });
+      const derivedYAtom = atom((get) => get(mut_mousePosAtom!).y);
 
-      const sizeAtom = atom((get) => {
-        const pos = get(mut_mousePosAtom!);
-
-        return {
-          width: Math.abs(pos.x - startPos.x),
-          height: Math.abs(pos.y - startPos.y),
-        };
-      });
-
-      const rectAtom = atom((get) => ({
-        ...get(topLeftAtom),
-        ...get(sizeAtom),
+      const combinedAtom = atom((get) => ({
+        x: get(derivedXAtom),
+        y: get(derivedYAtom),
       }));
 
       // Jotai requires an initial read to set up subscriptions
-      mut_store.get(rectAtom);
+      mut_store.get(combinedAtom);
 
-      mut_unsubscribe = mut_store.sub(rectAtom, () => {
-        onEmit(mut_store!.get(rectAtom));
+      mut_unsubscribe = mut_store.sub(combinedAtom, () => {
+        onEmit(mut_store!.get(combinedAtom));
       });
     },
     onMouseMove: (pos) => {

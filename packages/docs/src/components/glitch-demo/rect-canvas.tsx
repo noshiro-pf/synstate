@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { type Adapter, type Point, type RectData } from './types.js';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from './adapters/synstate-adapter.js';
+import { type Adapter, type Point } from './types.js';
 
 type Stats = Readonly<{
   totalUpdates: number;
@@ -9,116 +10,121 @@ type Stats = Readonly<{
 
 type Props = Readonly<{
   adapter: Adapter;
-  dragState: {
-    isDragging: boolean;
-    startPos: Point | null;
-    currentPos: Point | null;
-  };
 }>;
 
-const CANVAS_WIDTH = 300;
+const DOT_RADIUS = 2.5;
+const COLOR_NORMAL = 'rgba(59, 130, 246, 0.7)';
+const COLOR_GLITCH = 'rgba(239, 68, 68, 0.7)';
 
-const CANVAS_HEIGHT = 220;
+const INITIAL_STATS: Stats = {
+  totalUpdates: 0,
+  glitches: 0,
+  totalMicroseconds: 0,
+};
 
-const COLOR_NORMAL = 'rgba(59, 130, 246, 0.15)';
-
-const COLOR_GLITCH = 'rgba(239, 68, 68, 0.15)';
-
-const computeExpectedRect = (startPos: Point, currentPos: Point): RectData => ({
-  x: Math.min(startPos.x, currentPos.x),
-  y: Math.min(startPos.y, currentPos.y),
-  width: Math.abs(currentPos.x - startPos.x),
-  height: Math.abs(currentPos.y - startPos.y),
-});
-
-const rectsMatch = (a: RectData, b: RectData): boolean =>
-  a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
-
-export const RectCanvas: React.FC<Props> = ({ adapter, dragState }) => {
+export const RectCanvas: React.FC<Props> = ({ adapter }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const latestPosRef = useRef<Point>({ x: -1, y: -1 });
+  const isDraggingRef = useRef(false);
+  const [stats, setStats] = useState<Stats>(INITIAL_STATS);
 
-  const latestPosRef = useRef<Point | null>(null);
-
-  const startPosRef = useRef<Point | null>(null);
-
-  const [stats, setStats] = useState<Stats>({
-    totalUpdates: 0,
-    glitches: 0,
-    totalMicroseconds: 0,
-  });
-
-  const clearCanvas = useCallback(() => {
-    const ctx = canvasRef.current?.getContext('2d');
-
-    if (ctx == null) return;
-
-    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  }, []);
-
-  // Handle drag lifecycle
+  // Setup adapter once on mount
   useEffect(() => {
-    if (dragState.isDragging && dragState.startPos != null) {
-      // Drag started
-      startPosRef.current = dragState.startPos;
+    adapter.setup({
+      onEmit: (pos) => {
+        if (!isDraggingRef.current) return;
+        if (pos.x < 0 || pos.y < 0) return;
 
-      latestPosRef.current = dragState.startPos;
+        const t0 = performance.now();
+        const latestPos = latestPosRef.current;
+        const mut_glitch = pos.x !== latestPos.x || pos.y !== latestPos.y;
 
-      clearCanvas();
+        const mut_ctx = canvasRef.current?.getContext('2d');
 
-      setStats({ totalUpdates: 0, glitches: 0, totalMicroseconds: 0 });
+        if (mut_ctx != null) {
+          mut_ctx.beginPath();
+          mut_ctx.arc(pos.x, pos.y, DOT_RADIUS, 0, Math.PI * 2);
+          mut_ctx.fillStyle = mut_glitch ? COLOR_GLITCH : COLOR_NORMAL;
+          mut_ctx.fill();
+        }
 
-      adapter.setup(dragState.startPos, {
-        onEmit: (rect) => {
-          const t0 = performance.now();
+        const elapsed = (performance.now() - t0) * 1000; // to microseconds
 
-          const startPos = startPosRef.current;
-
-          const currentPos = latestPosRef.current;
-
-          let mut_isGlitch = false;
-
-          if (startPos != null && currentPos != null) {
-            const expected = computeExpectedRect(startPos, currentPos);
-
-            mut_isGlitch = !rectsMatch(rect, expected);
-          }
-
-          const mut_ctx = canvasRef.current?.getContext('2d');
-
-          if (mut_ctx != null) {
-            mut_ctx.fillStyle = mut_isGlitch ? COLOR_GLITCH : COLOR_NORMAL;
-
-            mut_ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
-          }
-
-          const elapsed = (performance.now() - t0) * 1000; // to microseconds
-
-          setStats((prev) => ({
-            totalUpdates: prev.totalUpdates + 1,
-            glitches: prev.glitches + (mut_isGlitch ? 1 : 0),
-            totalMicroseconds: prev.totalMicroseconds + elapsed,
-          }));
-        },
-      });
-    }
-
-    if (!dragState.isDragging) {
-      adapter.cleanup();
-    }
+        setStats((prev) => ({
+          totalUpdates: prev.totalUpdates + 1,
+          glitches: prev.glitches + (mut_glitch ? 1 : 0),
+          totalMicroseconds: prev.totalMicroseconds + elapsed,
+        }));
+      },
+    });
 
     return () => {
-      // cleanup on unmount
+      adapter.cleanup();
     };
-  }, [dragState.isDragging, dragState.startPos]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Handle mouse move
-  useEffect(() => {
-    if (dragState.isDragging && dragState.currentPos != null) {
-      latestPosRef.current = dragState.currentPos;
+  const getCanvasPos = useCallback(
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    (e: React.MouseEvent<HTMLCanvasElement>): Point => {
+      const canvas = canvasRef.current;
 
-      adapter.onMouseMove(dragState.currentPos);
-    }
-  }, [adapter, dragState.isDragging, dragState.currentPos]);
+      if (canvas == null) return { x: 0, y: 0 };
+
+      const rect = canvas.getBoundingClientRect();
+
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+    },
+    [],
+  );
+
+  const handleMouseDown = useCallback(
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      e.preventDefault();
+
+      // Clear canvas for new drag
+      const ctx = canvasRef.current?.getContext('2d');
+
+      ctx?.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      setStats(INITIAL_STATS);
+
+      isDraggingRef.current = true;
+
+      const pos = getCanvasPos(e);
+
+      latestPosRef.current = pos;
+
+      adapter.onMouseMove(pos);
+    },
+    [adapter, getCanvasPos],
+  );
+
+  const handleMouseMove = useCallback(
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      if (!isDraggingRef.current) return;
+
+      const pos = getCanvasPos(e);
+
+      latestPosRef.current = pos;
+
+      adapter.onMouseMove(pos);
+    },
+    [adapter, getCanvasPos],
+  );
+
+  const handleMouseUp = useCallback(() => {
+    isDraggingRef.current = false;
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    isDraggingRef.current = false;
+  }, []);
 
   const avgMicroseconds =
     stats.totalUpdates > 0
@@ -148,10 +154,15 @@ export const RectCanvas: React.FC<Props> = ({ adapter, dragState }) => {
         ref={canvasRef}
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
         style={{
           border: '1px solid var(--sl-color-gray-5, #d1d5db)',
           borderRadius: '6px',
           background: 'var(--sl-color-bg-nav, #fff)',
+          cursor: 'crosshair',
         }}
       />
       <div
