@@ -6,6 +6,13 @@ sidebar:
     order: 30
 ---
 
+<!-- jsdoc-description -->
+
+Creates a new Observable source that can manually emit values.
+This is the primary way to create root observables that start reactive chains.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

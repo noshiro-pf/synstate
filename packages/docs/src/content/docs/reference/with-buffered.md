@@ -6,6 +6,13 @@ sidebar:
     order: 82
 ---
 
+<!-- jsdoc-description -->
+
+Buffers values from the source observable and emits them along with the parent value
+when the parent emits. The buffer is cleared after each emission.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

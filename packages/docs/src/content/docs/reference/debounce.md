@@ -6,6 +6,13 @@ sidebar:
     order: 71
 ---
 
+<!-- jsdoc-description -->
+
+Delays emissions from the source observable until a specified time has passed without another emission.
+Useful for handling user input events like typing or scrolling.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

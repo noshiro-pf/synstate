@@ -6,6 +6,14 @@ sidebar:
     order: 84
 ---
 
+<!-- jsdoc-description -->
+
+Provides an initial value for an observable that doesn't have one.
+The resulting observable will immediately emit the initial value upon subscription,
+and then emit all subsequent values from the source.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

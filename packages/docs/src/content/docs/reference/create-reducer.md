@@ -6,6 +6,13 @@ sidebar:
     order: 11
 ---
 
+<!-- jsdoc-description -->
+
+Creates a reducer-based state management container following the Redux pattern.
+Actions are dispatched to update the state according to the reducer function.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

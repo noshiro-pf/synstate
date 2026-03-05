@@ -6,6 +6,13 @@ sidebar:
     order: 12
 ---
 
+<!-- jsdoc-description -->
+
+Creates a reactive state container with getter and setter methods.
+Provides a simple state management solution with observable state.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

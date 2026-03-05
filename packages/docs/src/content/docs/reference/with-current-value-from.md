@@ -6,6 +6,13 @@ sidebar:
     order: 83
 ---
 
+<!-- jsdoc-description -->
+
+Samples the current value from another observable each time the source emits.
+Emits a tuple of [sourceValue, sampledValue].
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

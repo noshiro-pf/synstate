@@ -6,6 +6,13 @@ sidebar:
     order: 31
 ---
 
+<!-- jsdoc-description -->
+
+Creates an observable from a Promise.
+Emits Result.ok when the promise resolves, or Result.err when it rejects.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

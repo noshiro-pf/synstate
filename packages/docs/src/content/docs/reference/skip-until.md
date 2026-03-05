@@ -6,6 +6,12 @@ sidebar:
     order: 66
 ---
 
+<!-- jsdoc-description -->
+
+Skips all values from the source observable until the notifier observable emits.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

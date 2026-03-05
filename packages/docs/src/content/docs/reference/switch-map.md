@@ -6,6 +6,13 @@ sidebar:
     order: 51
 ---
 
+<!-- jsdoc-description -->
+
+Projects each source value to an observable, subscribes to it, and emits its values.
+When a new value arrives from the source, the previous inner observable is unsubscribed.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

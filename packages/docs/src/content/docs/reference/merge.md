@@ -6,6 +6,13 @@ sidebar:
     order: 91
 ---
 
+<!-- jsdoc-description -->
+
+Merges multiple observables into a single observable that emits all values from all sources.
+Emits whenever any source observable emits a value.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

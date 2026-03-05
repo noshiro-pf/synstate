@@ -6,6 +6,13 @@ sidebar:
     order: 64
 ---
 
+<!-- jsdoc-description -->
+
+Skips values from the source observable while the predicate returns true.
+Once the predicate returns false, all subsequent values pass through.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

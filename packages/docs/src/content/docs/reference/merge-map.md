@@ -6,6 +6,13 @@ sidebar:
     order: 50
 ---
 
+<!-- jsdoc-description -->
+
+Projects each source value to an observable and merges all inner observables.
+Unlike `switchMap`, does not cancel previous inner observables.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

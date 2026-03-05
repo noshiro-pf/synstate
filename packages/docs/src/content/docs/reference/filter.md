@@ -6,6 +6,13 @@ sidebar:
     order: 60
 ---
 
+<!-- jsdoc-description -->
+
+Filters values emitted by the source observable based on a predicate function.
+Only values that satisfy the predicate will be emitted by the resulting observable.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

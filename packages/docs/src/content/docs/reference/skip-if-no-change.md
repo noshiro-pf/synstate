@@ -6,6 +6,13 @@ sidebar:
     order: 61
 ---
 
+<!-- jsdoc-description -->
+
+Skips emissions if the value hasn't changed from the previous emission.
+Uses a custom equality function or Object.is by default.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

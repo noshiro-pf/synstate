@@ -6,6 +6,13 @@ sidebar:
     order: 80
 ---
 
+<!-- jsdoc-description -->
+
+Emits the previous and current values as a pair.
+Does not emit until the source has emitted at least twice.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

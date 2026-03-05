@@ -6,6 +6,13 @@ sidebar:
     order: 67
 ---
 
+<!-- jsdoc-description -->
+
+Emits values from the source until the notifier observable emits.
+When the notifier emits, this observable completes.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

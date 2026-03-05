@@ -6,6 +6,13 @@ sidebar:
     order: 32
 ---
 
+<!-- jsdoc-description -->
+
+Converts any subscribable object into a SynState Observable.
+Works with objects that have a subscribe(onNext, onError, onComplete) method.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

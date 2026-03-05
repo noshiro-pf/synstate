@@ -6,9 +6,10 @@
   "scripts": {
     "build": "pnpm run doc && astro build",
     "dev": "astro dev",
-    "doc": "run-s doc:embed:bundle-size doc:embed fmt",
+    "doc": "run-s doc:embed:bundle-size doc:embed:jsdoc doc:embed fmt",
     "doc:embed": "tsx ./scripts/embed-examples.mts",
     "doc:embed:bundle-size": "tsx ./scripts/embed-bundle-size.mts",
+    "doc:embed:jsdoc": "tsx ./scripts/embed-jsdoc-descriptions.mts",
     "fmt": "format-uncommitted",
     "fmt:full": "pnpm run z:prettier .",
     "lint": "eslint .",

@@ -6,6 +6,12 @@ sidebar:
     order: 40
 ---
 
+<!-- jsdoc-description -->
+
+Transforms each value emitted by the source using a mapping function that also receives the emission index.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

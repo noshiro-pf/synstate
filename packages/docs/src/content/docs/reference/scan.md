@@ -6,6 +6,13 @@ sidebar:
     order: 81
 ---
 
+<!-- jsdoc-description -->
+
+Applies an accumulator function over the source observable and emits each intermediate result.
+Similar to Array.reduce but emits accumulated value after each source emission.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

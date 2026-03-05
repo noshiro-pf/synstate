@@ -6,6 +6,13 @@ sidebar:
     order: 33
 ---
 
+<!-- jsdoc-description -->
+
+Creates an observable that emits incremental numbers at a specified interval.
+Starts with 0 immediately after subscription, then emits 1, 2, 3, ... every interval.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

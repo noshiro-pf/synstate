@@ -6,6 +6,14 @@ sidebar:
     order: 92
 ---
 
+<!-- jsdoc-description -->
+
+Combines multiple observables by pairing their emissions by index.
+Waits for all sources to emit their nth value before emitting the nth tuple.
+Completes when any source completes.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

@@ -6,6 +6,14 @@ sidebar:
     order: 70
 ---
 
+<!-- jsdoc-description -->
+
+Ignores source values for duration milliseconds, then emits the most recent value from the source Observable, then repeats this process.
+
+Unlike `throttle` which emits the first value, `audit` emits the last value.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

@@ -6,6 +6,13 @@ sidebar:
     order: 72
 ---
 
+<!-- jsdoc-description -->
+
+Emits the first value, then ignores subsequent values for a specified duration.
+After the duration, the next emission is allowed through.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

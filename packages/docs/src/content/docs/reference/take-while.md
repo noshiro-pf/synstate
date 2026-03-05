@@ -6,6 +6,13 @@ sidebar:
     order: 65
 ---
 
+<!-- jsdoc-description -->
+
+Emits values from the source observable while the predicate returns true.
+Completes immediately when the predicate returns false.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

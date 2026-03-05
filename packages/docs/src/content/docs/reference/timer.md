@@ -6,6 +6,12 @@ sidebar:
     order: 34
 ---
 
+<!-- jsdoc-description -->
+
+Creates an observable that emits 0 after a specified delay and then completes.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx

@@ -6,6 +6,13 @@ sidebar:
     order: 90
 ---
 
+<!-- jsdoc-description -->
+
+Combines multiple observables into a single observable that emits an array of their latest values.
+Emits whenever any of the source observables emit, but only after all sources have emitted at least once.
+
+<!-- /jsdoc-description -->
+
 ## Example
 
 ```tsx
