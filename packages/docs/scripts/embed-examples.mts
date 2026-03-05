@@ -11,6 +11,59 @@ const codeBlockStart = '```tsx';
 
 const codeBlockEnd = '```';
 
+// --- Helper: generate reference page → sample mapping ---
+
+const refDir = path.resolve(workspaceRootPath, 'src/content/docs/reference');
+
+const srcSamplesDir = path.resolve(synstateSamplesRoot, 'src');
+
+/** Maps reference page slug → sample file name */
+const referencePageSamples: DeepReadonly<[slug: string, sampleFile: string][]> =
+  [
+    ['audit', 'audit-example.mts'],
+    ['combine', 'combine-example.mts'],
+    ['counter', 'counter-example.mts'],
+    ['create-boolean-state', 'create-boolean-state-example.mts'],
+    ['create-event-emitter', 'create-void-event-emitter-example.mts'],
+    ['create-reducer', 'create-reducer-example.mts'],
+    ['create-state', 'create-state-example.mts'],
+    ['create-value-emitter', 'create-event-emitter-example.mts'],
+    ['debounce', 'debounce-example.mts'],
+    ['filter', 'filter-example.mts'],
+    ['from-promise', 'from-promise-example.mts'],
+    ['from-subscribable', 'from-subscribable-example.mts'],
+    ['map', 'map-example.mts'],
+    ['merge', 'merge-example.mts'],
+    ['merge-map', 'merge-map-example.mts'],
+    ['pairwise', 'pairwise-example.mts'],
+    ['scan', 'scan-example.mts'],
+    ['skip-if-no-change', 'skip-if-no-change-example.mts'],
+    ['skip-until', 'skip-until-example.mts'],
+    ['skip-while', 'skip-while-example.mts'],
+    ['source', 'source-example.mts'],
+    ['switch-map', 'switch-map-example.mts'],
+    ['take-until', 'take-until-example.mts'],
+    ['take-while', 'take-while-example.mts'],
+    ['throttle', 'throttle-example.mts'],
+    ['timer', 'timer-example.mts'],
+    ['with-buffered', 'with-buffered-from-example.mts'],
+    ['with-current-value-from', 'with-current-value-from-example.mts'],
+    ['with-initial-value', 'with-initial-value-example.mts'],
+    ['zip', 'zip-example.mts'],
+  ];
+
+const referenceDocuments: DeepReadonly<
+  {
+    mdPath: string;
+    samplesDir: string;
+    sampleCodeFiles: string[];
+  }[]
+> = referencePageSamples.map(([slug, sampleFile]) => ({
+  mdPath: path.resolve(refDir, `${slug}.md`),
+  samplesDir: srcSamplesDir,
+  sampleCodeFiles: [sampleFile],
+}));
+
 // --- Document → Sample mapping ---
 
 const documents: DeepReadonly<
@@ -87,6 +140,7 @@ const documents: DeepReadonly<
       '01-simple-glitch-example.zustand.mts',
     ],
   },
+  ...referenceDocuments,
 ] as const;
 
 const embedExamples = async (): Promise<void> => {
