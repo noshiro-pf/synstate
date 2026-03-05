@@ -1,6 +1,6 @@
 import { asSafeUint, Optional, SafeUint } from 'ts-data-forge';
 import { RootObservableClass } from '../class/index.mjs';
-import { type CounterObservable } from '../types/index.mjs';
+import { type CounterObservable, type TimerId } from '../types/index.mjs';
 
 /**
  * Creates an observable that emits incremental numbers at a specified interval.

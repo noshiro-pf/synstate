@@ -4,6 +4,7 @@ import {
   type AuditOperatorObservable,
   type KeepInitialValueOperator,
   type Observable,
+  type TimerId,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 

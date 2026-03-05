@@ -4,6 +4,7 @@ import {
   type KeepInitialValueOperator,
   type Observable,
   type ThrottleOperatorObservable,
+  type TimerId,
   type UpdaterSymbol,
 } from '../types/index.mjs';
 
