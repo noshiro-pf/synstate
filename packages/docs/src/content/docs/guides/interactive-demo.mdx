@@ -32,18 +32,20 @@ Each emitted position is compared to the latest mouse position:
 
 ### What to look for
 
-| Library      | Glitches | Performance | Why                                                                                                                                |
-| ------------ | -------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| **SynState** | 0        | Fast        | Depth-based topological update — all branches resolve atomically before notifying subscribers                                      |
-| **RxJS**     | Many     | Fast        | `combineLatest` fires on each input change, so `derivedX` updates before `derivedY` causing intermediate emissions with stale data |
-| **Jotai**    | 0        | Slower      | Pull-based derivation ensures consistency, but re-computation overhead is higher per update                                        |
+| Library      | Glitches | Why                                                                                                                                |
+| ------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **SynState** | 0        | Depth-based topological update — all branches resolve atomically before notifying subscribers                                      |
+| **RxJS**     | Many     | `combineLatest` fires on each input change, so `derivedX` updates before `derivedY` causing intermediate emissions with stale data |
+| **Jotai**    | 0        | Pull-based derivation ensures consistency — derived atoms always read the latest values                                            |
 
-### Why this matters
+With only 2 derived values, all three libraries are fast enough that the performance difference is negligible. But the extra emissions from RxJS become a serious performance problem as the graph grows — see the [spring-follower demo below](#spring-follower-chain-performance-under-load).
+
+### Why glitches matter
 
 In real applications, diamond dependencies appear everywhere — computed styles from shared state, derived UI values, form validations. Glitches cause:
 
 - **Visual flicker** — UI renders an impossible intermediate state
-- **Wasted renders** — extra emissions trigger unnecessary work
+- **Wasted work** — each extra emission triggers unnecessary side effects. With N inputs to `combineLatest`, a single source update causes N+1 emissions — this scales to an **O(N²) performance cliff** as shown in the demo below
 - **Logic bugs** — side effects fire with inconsistent data
 
 SynState eliminates these problems at the library level, with no manual workarounds needed.
