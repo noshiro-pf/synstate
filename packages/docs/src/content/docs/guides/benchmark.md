@@ -480,3 +480,40 @@ export const runBenchmark = (n: number): number => {
 - **MobX**: `reaction` is used instead of `autorun` to match other libraries' subscribe-and-record pattern. `runInAction` wraps each mutation as required by MobX strict mode.
 - **Jotai**: `store.sub()` does not pass the current value to the callback, so an additional `store.get()` call is made inside the listener. The initial value is also read via `store.get()` before subscribing.
 - All libraries create their state, derived values, and subscriptions inside the benchmark function. Setup cost is included in the measurement.
+
+## Analysis: Why Jotai Is ~29× Slower
+
+Jotai is the slowest library in both scenarios despite having glitch-free semantics. The root cause is **per-update framework overhead** — work that Jotai's store performs on every `store.set()` call, regardless of graph size.
+
+### Per-update cost breakdown
+
+When `store.set(counterAtom, i)` is called, Jotai's store executes these steps:
+
+1. **Value update** — write the new value and compare with `Object.is`. O(1).
+2. **Invalidation pass** (`invalidateDependents`) — DFS traversal of all mounted dependents, marking each as "needs recomputation" via epoch number tracking in a `Map<Atom, EpochNumber>`. O(N) where N = number of affected atoms.
+3. **Topological sort** (`recomputeInvalidatedAtoms`) — a second DFS post-order traversal using `WeakSet` for visit tracking, producing a correctly ordered list of atoms to recompute. O(N).
+4. **Recomputation** — for each atom in topological order, execute its `read` function. Inside the read function, each `get(dep)` call: (a) looks up the dependency's `AtomState`, (b) compares epoch numbers to check staleness, (c) records the dependency in a `Map` for future invalidation. The cost is O(Σ Dᵢ) — the sum of direct dependencies across all recomputed atoms, not the product. In a chain of N atoms each with 1 dependency, this is O(N).
+5. **Subscriber notification** — fire listener callbacks. Jotai's `store.sub()` does not pass the new value, so the callback must call `store.get()` again, triggering an additional cache lookup. O(1) per listener, but adds one extra traversal.
+
+### Comparison with SynState
+
+| Step                          | SynState                                                   | Jotai                                                                  |
+| ----------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Graph resolution**          | Once at subscribe time                                     | Every `store.set()` (steps 2–3)                                        |
+| **Propagation**               | Direct function calls through pre-built subscription chain | `read` function execution with getter spy + `Map`/`WeakSet` operations |
+| **Dependency tracking**       | Static (set at subscribe time)                             | Dynamic (rediscovered on every evaluation via getter spy)              |
+| **Staleness check**           | Not needed (push-based)                                    | Epoch number comparison per `get()` call                               |
+| **Subscriber value delivery** | Value passed directly to callback                          | Callback must call `store.get()` to read the value                     |
+
+### Why the constant factor matters
+
+For the 3-node derived chain (`counter → doubled → quadrupled`), both SynState and Jotai are O(1) per update (the graph size is constant). But the constant-time work is very different:
+
+- **SynState**: `setCounter(i)` → call `doubled`'s map function → call `quadrupled`'s map function → call subscriber. Three direct function calls with no framework bookkeeping.
+- **Jotai**: `store.set(counterAtom, i)` → DFS invalidation (WeakSet alloc + Map writes) → DFS topological sort (WeakSet alloc + array push + reverse) → recompute `doubledAtom` (Map lookup + epoch check + Map write) → recompute `quadrupledAtom` (same) → flush callback → `store.get(quadrupledAtom)` (cache lookup).
+
+Over 100,000 iterations, SynState's three function calls dominate, while Jotai's per-update bookkeeping (Map/WeakSet allocations, epoch comparisons, two DFS traversals) accumulates into the observed ~29× difference.
+
+### Trade-off
+
+Jotai's design prioritizes **flexibility over raw throughput**. Dynamic dependency discovery enables powerful patterns like conditional dependencies (`get(condition) ? get(atomA) : get(atomB)`) and lazy evaluation. These features are valuable in UI applications where the dependency graph is complex and changes at runtime. The per-update overhead is negligible for typical UI update frequencies (60 fps = ~16ms budget), but becomes visible in tight synchronous loops like this benchmark.

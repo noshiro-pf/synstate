@@ -1,15 +1,19 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { atom, createStore } from 'jotai';
+import { selectAtom } from 'jotai/utils';
 import { range } from 'ts-data-forge';
 import { type Point, type SpringAdapter } from '../types.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, LERP_FACTOR, lerp } from './shared.mjs';
+
+// selectAtom's selector receives (currentValue, prevSlice?).
+// prevSlice is the atom's own previous output — equivalent to scan's accumulator.
+const springSelector = (target: Point, prevSelf?: Point): Point =>
+  prevSelf == null ? target : lerp(prevSelf, target, LERP_FACTOR);
 
 export const createJotaiSpringAdapter = (): SpringAdapter => {
   let mut_store: ReturnType<typeof createStore> | undefined;
 
   let mut_mousePosAtom: ReturnType<typeof atom<Point>> | undefined;
-
-  let mut_stageAtoms: ReturnType<typeof atom<Point>>[] | undefined;
 
   let mut_unsubscribe: (() => void) | undefined;
 
@@ -25,22 +29,35 @@ export const createJotaiSpringAdapter = (): SpringAdapter => {
 
       mut_mousePosAtom = atom<Point>(startPos);
 
-      // Create writable atoms for each stage's position
-      mut_stageAtoms = [];
+      // Build depth-N chain using selectAtom: each stage depends on the
+      // previous stage and has access to its own previous output (prevSlice),
+      // providing scan-equivalent semantics as a chain of derived atoms.
+      const mut_stageAtoms: ReturnType<typeof selectAtom<Point, Point>>[] = [];
+
+      let mut_prevAtom:
+        | ReturnType<typeof selectAtom<Point, Point>>
+        | ReturnType<typeof atom<Point>> = mut_mousePosAtom;
 
       for (const _ of range(0, chainDepth)) {
-        mut_stageAtoms.push(atom<Point>(startPos));
+        const prevAtom = mut_prevAtom;
+
+        const stageAtom = selectAtom<Point, Point>(
+          prevAtom,
+          springSelector,
+          // Never skip: always propagate since we create new Point objects
+          () => false,
+        );
+
+        mut_stageAtoms.push(stageAtom);
+
+        mut_prevAtom = stageAtom;
       }
 
       // Derived atom that reads head + all stages
-      const stageAtomsCopy = mut_stageAtoms;
-
-      const mousePosAtomCopy = mut_mousePosAtom;
-
       const allPointsAtom = atom((get) => {
-        const head = get(mousePosAtomCopy);
+        const head = get(mut_mousePosAtom!);
 
-        return [head, ...stageAtomsCopy.map((a) => get(a))];
+        return [head, ...mut_stageAtoms.map((a) => get(a))];
       });
 
       // Initial read to establish subscription
@@ -51,29 +68,13 @@ export const createJotaiSpringAdapter = (): SpringAdapter => {
       });
     },
     onMouseMove: (pos) => {
-      if (
-        mut_store == null ||
-        mut_mousePosAtom == null ||
-        mut_stageAtoms == null
-      ) {
+      if (mut_store == null || mut_mousePosAtom == null) {
         return;
       }
 
-      // Update head
+      // Set the source atom — Jotai's pull-based engine recomputes
+      // the selectAtom chain on the next read (in the subscriber callback)
       mut_store.set(mut_mousePosAtom, pos);
-
-      // Propagate through spring chain: each stage lerps toward the previous
-      let mut_target = pos;
-
-      for (const stageAtom of mut_stageAtoms) {
-        const current = mut_store.get(stageAtom);
-
-        const next = lerp(current, mut_target, LERP_FACTOR);
-
-        mut_store.set(stageAtom, next);
-
-        mut_target = next;
-      }
     },
     cleanup: () => {
       mut_unsubscribe?.();
@@ -83,8 +84,6 @@ export const createJotaiSpringAdapter = (): SpringAdapter => {
       mut_store = undefined;
 
       mut_mousePosAtom = undefined;
-
-      mut_stageAtoms = undefined;
     },
   };
 };

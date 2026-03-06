@@ -38,7 +38,7 @@ Each emitted position is compared to the latest mouse position:
 | **RxJS**     | Many     | `combineLatest` fires on each input change, so `derivedX` updates before `derivedY` causing intermediate emissions with stale data |
 | **Jotai**    | 0        | Pull-based derivation ensures consistency — derived atoms always read the latest values                                            |
 
-With only 2 derived values, all three libraries are fast enough that the performance difference is negligible. But the extra emissions from RxJS become a serious performance problem as the graph grows — see the [spring-follower demo below](#spring-follower-chain-performance-under-load).
+With only 2 derived values, all three libraries are fast enough that the performance difference is negligible. But the extra emissions from RxJS become a serious performance problem as the graph grows — see the [deep dependency chain demo below](#deep-dependency-chain-propagation-under-load).
 
 ### Why glitches matter
 
@@ -52,9 +52,11 @@ SynState eliminates these problems at the library level, with no manual workarou
 
 ---
 
-## Spring-Follower Chain: Performance Under Load
+## Deep Dependency Chain: Propagation Under Load
 
-This demo shows how each library handles a **deep reactive chain**. A snake tail follows the mouse — each segment is a stage in a `scan` chain that smoothly follows the previous stage:
+**Purpose:** This demo measures the **serial dependency chain propagation performance** of each reactive framework. All three libraries build an identical reactive graph topology: a **depth-N chain** of stateful nodes where each depends on the previous, with a final combine/derive that reads all N+1 outputs.
+
+A snake tail follows the mouse — each segment is a stage in the chain that smoothly follows the previous stage via linear interpolation (lerp):
 
 ```
 mousePos (head)
@@ -64,13 +66,17 @@ mousePos (head)
         ...
 ```
 
-To draw the full snake, all N stage outputs are collected with `combine` / `combineLatest`:
+To draw the full snake, all N stage outputs are collected:
 
 ```
-combine([source, scan₁, scan₂, ..., scanN]) → subscriber (draw snake)
+combine([source, stage₁, stage₂, ..., stageN]) → subscriber (draw snake)
 ```
 
-Jotai doesn't have a `scan` operator, so the spring propagation is done imperatively: N writable atoms are updated via a write-derived "transaction atom" that batches all `store.set()` calls into a single flush. A derived atom reads all N stage atoms to produce the point array for drawing.
+All three libraries use the same **depth-N chain** graph topology. The key difference is how `scan` (stateful derivation) is expressed:
+
+- **SynState**: `source.pipe(scan(lerp))` — native `scan` operator, depth-N chain
+- **RxJS**: `source$.pipe(scan(lerp))` — native `scan` operator, depth-N chain
+- **Jotai**: `selectAtom(prevStage, (target, prevSelf) => lerp(prevSelf, target))` — `selectAtom` provides access to the atom's own previous output, acting as a scan equivalent. Depth-N chain of derived atoms
 
 Increase the chain depth with the slider. At higher values, watch for stutter and rising μs/update.
 
@@ -80,7 +86,7 @@ Increase the chain depth with the slider. At higher values, watch for stutter an
 
 - At **low N** (10–50): all three libraries render smoothly
 - At **high N**: RxJS starts stuttering first — check the **Total updates** counter to see why
-- SynState and Jotai stay smoother at higher N, but Jotai shows higher μs/update due to per-operation overhead
+- SynState and Jotai stay smoother at higher N, but Jotai shows higher μs/update due to per-atom store overhead in its pull-based engine
 
 ### Why RxJS struggles here
 
@@ -97,32 +103,16 @@ This is the glitch problem from the first demo manifesting as a **performance cl
 
 ### SynState vs Jotai
 
-Both SynState and Jotai fire the subscriber **once** per mouse event, making them both **O(N)**. The difference is in the constant factor:
+Both SynState and Jotai fire the subscriber **once** per mouse event, making them both **O(N)**. The difference is in the constant factor per update:
 
-- **SynState**: push-based propagation through a declarative `scan` chain — the reactive graph does the work automatically
-- **Jotai**: imperative propagation via a transaction atom (`store.set` N times within a write function) — Jotai batches these into one flush, but each `get()` / `set()` carries store overhead
+- **SynState**: push-based — the framework propagates through the depth-N `scan` chain via direct function calls and fires `combine` once after all stages are resolved. The propagation order is resolved once at subscribe time.
+- **Jotai**: pull-based — each `store.set()` triggers (1) a DFS invalidation pass marking all N dependents as stale, (2) a DFS topological sort to determine recomputation order, (3) recomputation of each `selectAtom` via `get()` with epoch-based staleness checks and dynamic dependency tracking. **The topological sort is performed on every update**, not once at setup time. See the [benchmark analysis](/synstate/guides/benchmark/#analysis-why-jotai-is-29-slower) for details.
 
-#### Important caveat: different graph topologies
-
-The reactive graph structures are **fundamentally different** between SynState/RxJS and Jotai:
-
-- **SynState / RxJS**: a **depth-N chain** — `source → scan₁ → scan₂ → … → scanN → combine`. The framework's propagation engine walks N levels of dependencies per update.
-- **Jotai**: a **flat graph** — N independent writable atoms + 1 derived atom that reads them all. The spring propagation (lerp loop) runs as plain JavaScript inside the transaction atom's write function, not as framework-managed dependency resolution. The reactive graph depth is just **1**.
-
-This is not an unfair optimization — it is an inherent consequence of Jotai's design. Jotai derived atoms are pure functions of other atoms and **cannot reference their own previous value**, so a stateful operator like `scan` cannot be expressed as a chain of derived atoms. The imperative transaction atom pattern is the idiomatic Jotai approach.
-
-As a result, this demo measures slightly different things for each library:
-
-- **SynState / RxJS**: framework propagation cost through a deep dependency chain
-- **Jotai**: store read/write throughput on a flat set of atoms
-
-Jotai excels at derived state (pure functions of other atoms) while SynState handles streaming/stateful pipelines natively. Choosing between them depends on whether your use case is closer to **derived state** or **event-driven state machines**.
-
-| Library      | Graph depth | Propagation                 | Subscriber calls per mouse event | Total work per event  |
-| ------------ | ----------- | --------------------------- | -------------------------------- | --------------------- |
-| **SynState** | N           | N stages (declarative push) | **1** (atomic combine)           | O(N)                  |
-| **Jotai**    | 1           | N stages (imperative batch) | **1** (transaction atom)         | O(N), higher constant |
-| **RxJS**     | N           | N stages (push)             | **N+1** (combineLatest glitch)   | O(N²)                 |
+| Library      | Graph depth | Propagation   | Subscriber calls per mouse event | Total work per event  |
+| ------------ | ----------- | ------------- | -------------------------------- | --------------------- |
+| **SynState** | N           | push (atomic) | **1** (atomic combine)           | O(N)                  |
+| **Jotai**    | N           | pull (lazy)   | **1** (derived read)             | O(N), higher constant |
+| **RxJS**     | N           | push (eager)  | **N+1** (combineLatest glitch)   | O(N²)                 |
 
 ### Related
 
