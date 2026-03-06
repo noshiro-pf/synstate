@@ -32,6 +32,7 @@ export default [
           allow: [
             ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
             '@astrojs/**',
+            'jotai/utils',
           ],
         },
       ],

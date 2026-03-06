@@ -70,6 +70,8 @@ To draw the full snake, all N stage outputs are collected with `combine` / `comb
 combine([source, scan₁, scan₂, ..., scanN]) → subscriber (draw snake)
 ```
 
+Jotai doesn't have a `scan` operator, so the spring propagation is done imperatively: N writable atoms are updated via a write-derived "transaction atom" that batches all `store.set()` calls into a single flush. A derived atom reads all N stage atoms to produce the point array for drawing.
+
 Increase the chain depth with the slider. At higher values, watch for stutter and rising μs/update.
 
 <SpringDemo client:only="react" />
@@ -77,16 +79,12 @@ Increase the chain depth with the slider. At higher values, watch for stutter an
 ### What to look for
 
 - At **low N** (10–50): all three libraries render smoothly
-- At **N > 300**: Jotai and RxJS start stuttering — check the **Total updates** counter to see why
-- **SynState** stays smooth even at N = 400+
+- At **high N**: RxJS starts stuttering first — check the **Total updates** counter to see why
+- SynState and Jotai stay smoother at higher N, but Jotai shows higher μs/update due to per-operation overhead
 
-### Why only SynState stays fast
+### Why RxJS struggles here
 
-Both RxJS and Jotai suffer from **O(N²)** behavior, but for different reasons:
-
-**RxJS — `combineLatest` fires N+1 times per mouse event:**
-
-`combineLatest` fires every time **any** of its N+1 inputs emits. On a single mouse move, the scan chain propagates sequentially:
+Check the **Total updates** counter: RxJS shows roughly **N+1 times** more updates than SynState for the same mouse movement. `combineLatest` fires every time **any** of its N+1 inputs emits. On a single mouse move, the scan chain propagates sequentially:
 
 1. `source` emits → `combineLatest` fires (only source updated, scans still hold old values)
 2. `scan₁` emits → `combineLatest` fires again
@@ -95,23 +93,36 @@ Both RxJS and Jotai suffer from **O(N²)** behavior, but for different reasons:
 
 Each of these N+1 firings triggers a full canvas redraw of N+1 points → **O(N²)**.
 
-**Jotai — `store.set()` flushes N+1 times per mouse event:**
+This is the glitch problem from the first demo manifesting as a **performance cliff**: each intermediate emission triggers expensive side effects that compound with graph size.
 
-Jotai's `store.set()` calls `recomputeInvalidatedAtoms` + `flushCallbacks` **on each invocation**. Since the spring propagation requires N+1 separate `store.set()` calls (head + N stages), each one triggers a subscriber callback that reads N+1 atoms and redraws the canvas → also **O(N²)**.
+### SynState vs Jotai
 
-Note: Jotai **does** use topological sorting and caches derived atom values (so reading a chain A→B→C does NOT redundantly recompute A when computing C). The problem here is that multiple `store.set()` calls in a synchronous loop are not batched — each one independently triggers a full flush cycle.
+Both SynState and Jotai fire the subscriber **once** per mouse event, making them both **O(N)**. The difference is in the constant factor:
 
-**SynState — `combine` fires exactly once:**
+- **SynState**: push-based propagation through a declarative `scan` chain — the reactive graph does the work automatically
+- **Jotai**: imperative propagation via a transaction atom (`store.set` N times within a write function) — Jotai batches these into one flush, but each `get()` / `set()` carries store overhead
 
-SynState's `combine` uses depth-based topological ordering: it waits for **all** N scan stages to finish propagation, then fires the subscriber **exactly once**. Total cost: **O(N)**.
+#### Important caveat: different graph topologies
 
-| Library      | Propagation               | Subscriber calls per mouse event  | Total work per event |
-| ------------ | ------------------------- | --------------------------------- | -------------------- |
-| **SynState** | N stages (push)           | **1** (atomic combine)            | O(N)                 |
-| **RxJS**     | N stages (push)           | **N+1** (combineLatest per-input) | O(N²)                |
-| **Jotai**    | N stages (manual set/get) | **N+1** (flush per store.set)     | O(N²)                |
+The reactive graph structures are **fundamentally different** between SynState/RxJS and Jotai:
 
-This is the glitch problem manifesting as a **performance cliff**: intermediate emissions — whether from `combineLatest` or from unbatched `store.set()` — each trigger expensive side effects that compound with graph size.
+- **SynState / RxJS**: a **depth-N chain** — `source → scan₁ → scan₂ → … → scanN → combine`. The framework's propagation engine walks N levels of dependencies per update.
+- **Jotai**: a **flat graph** — N independent writable atoms + 1 derived atom that reads them all. The spring propagation (lerp loop) runs as plain JavaScript inside the transaction atom's write function, not as framework-managed dependency resolution. The reactive graph depth is just **1**.
+
+This is not an unfair optimization — it is an inherent consequence of Jotai's design. Jotai derived atoms are pure functions of other atoms and **cannot reference their own previous value**, so a stateful operator like `scan` cannot be expressed as a chain of derived atoms. The imperative transaction atom pattern is the idiomatic Jotai approach.
+
+As a result, this demo measures slightly different things for each library:
+
+- **SynState / RxJS**: framework propagation cost through a deep dependency chain
+- **Jotai**: store read/write throughput on a flat set of atoms
+
+Jotai excels at derived state (pure functions of other atoms) while SynState handles streaming/stateful pipelines natively. Choosing between them depends on whether your use case is closer to **derived state** or **event-driven state machines**.
+
+| Library      | Graph depth | Propagation                 | Subscriber calls per mouse event | Total work per event  |
+| ------------ | ----------- | --------------------------- | -------------------------------- | --------------------- |
+| **SynState** | N           | N stages (declarative push) | **1** (atomic combine)           | O(N)                  |
+| **Jotai**    | 1           | N stages (imperative batch) | **1** (transaction atom)         | O(N), higher constant |
+| **RxJS**     | N           | N stages (push)             | **N+1** (combineLatest glitch)   | O(N²)                 |
 
 ### Related
 
