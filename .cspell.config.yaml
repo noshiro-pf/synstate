@@ -12,6 +12,7 @@ words:
   - synstate
   - testw
   - tscw
+  - recomputations
   - unsub
   - valtio
 ignorePaths:
