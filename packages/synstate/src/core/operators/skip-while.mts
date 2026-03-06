@@ -32,10 +32,10 @@ import {
  *
  * const skipped$ = num$.pipe(skipWhile((x) => x < 5));
  *
- * const mut_history: number[] = [];
+ * const valueHistory: number[] = [];
  *
  * skipped$.subscribe((x) => {
- *   mut_history.push(x);
+ *   valueHistory.push(x);
  * });
  *
  * num$.next(1); // nothing logged
@@ -44,15 +44,15 @@ import {
  *
  * num$.next(5); // logs: 5
  *
- * assert.deepStrictEqual(mut_history, [5]);
+ * assert.deepStrictEqual(valueHistory, [5]);
  *
  * num$.next(6); // logs: 6
  *
- * assert.deepStrictEqual(mut_history, [5, 6]);
+ * assert.deepStrictEqual(valueHistory, [5, 6]);
  *
  * num$.next(7); // logs: 7
  *
- * assert.deepStrictEqual(mut_history, [5, 6, 7]);
+ * assert.deepStrictEqual(valueHistory, [5, 6, 7]);
  * ```
  */
 export const skipWhile =

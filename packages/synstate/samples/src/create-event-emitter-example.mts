@@ -6,19 +6,19 @@ if (import.meta.vitest !== undefined) {
 
     const [message$, emitMessage] = createValueEmitter<string>();
 
-    const mut_history: string[] = [];
+    const messageHistory: string[] = [];
 
     message$.subscribe((msg) => {
-      mut_history.push(msg);
+      messageHistory.push(msg);
     });
 
     emitMessage('Hello'); // logs: Hello
 
-    assert.deepStrictEqual(mut_history, ['Hello']);
+    assert.deepStrictEqual(messageHistory, ['Hello']);
 
     emitMessage('World');
 
-    assert.deepStrictEqual(mut_history, ['Hello', 'World']);
+    assert.deepStrictEqual(messageHistory, ['Hello', 'World']);
 
     // embed-sample-code-ignore-below
   });

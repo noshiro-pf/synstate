@@ -37,27 +37,27 @@ import { maxDepth } from '../utils/index.mjs';
  *
  * const result$ = name$.pipe(withCurrentValueFrom(age$));
  *
- * const mut_history: (readonly [string, number])[] = [];
+ * const valueHistory: (readonly [string, number])[] = [];
  *
  * result$.subscribe(([name_, currentAge]) => {
- *   mut_history.push([name_, currentAge]);
+ *   valueHistory.push([name_, currentAge]);
  * });
  *
  * name$.next('Alice'); // nothing logged (age$ hasn't emitted)
  *
- * assert.deepStrictEqual(mut_history, []);
+ * assert.deepStrictEqual(valueHistory, []);
  *
  * age$.next(25);
  *
  * name$.next('Bob'); // logs: Bob is 25 years old
  *
- * assert.deepStrictEqual(mut_history, [['Bob', 25]]);
+ * assert.deepStrictEqual(valueHistory, [['Bob', 25]]);
  *
  * age$.next(30);
  *
  * name$.next('Charlie'); // logs: Charlie is 30 years old
  *
- * assert.deepStrictEqual(mut_history, [
+ * assert.deepStrictEqual(valueHistory, [
  *   ['Bob', 25],
  *   ['Charlie', 30],
  * ]);

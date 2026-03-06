@@ -1,0 +1,65 @@
+---
+prev: false
+next: false
+title: switchMap
+sidebar:
+    order: 51
+---
+
+<!-- jsdoc-description -->
+
+Projects each source value to an observable, subscribes to it, and emits its values.
+When a new value arrives from the source, the previous inner observable is unsubscribed.
+
+<!-- /jsdoc-description -->
+
+## Example
+
+```tsx
+//  Timeline:
+//
+//  searchQuery$  "a"       "ab"      "abc"
+//  requests      fetch1    fetch2    fetch3
+//  results$                cancel    cancel    result3
+//                          fetch1    fetch2
+//
+//  Explanation:
+//  - switchMap cancels previous inner observables when a new value arrives
+//  - Only the result from the latest search query is emitted
+//  - Previous ongoing requests are cancelled
+//  - Ideal for search-as-you-type scenarios
+
+const searchQuery$ = source<string>();
+
+const results$ = searchQuery$.pipe(
+    switchMap((query) => {
+        const result$ = source<string[]>();
+
+        setTimeout(() => {
+            result$.next([query]);
+
+            result$.complete();
+        }, 10);
+
+        return result$;
+    }),
+);
+
+const valueHistory: string[][] = [];
+
+results$.subscribe((value) => {
+    valueHistory.push(value);
+});
+
+searchQuery$.next('a');
+
+searchQuery$.next('ab');
+
+searchQuery$.next('abc');
+
+await new Promise((resolve) => {
+    setTimeout(resolve, 200);
+});
+
+assert.deepStrictEqual(valueHistory, [['abc']]);
+```

@@ -48,10 +48,10 @@ import {
  *   }),
  * );
  *
- * const mut_history: string[][] = [];
+ * const valueHistory: string[][] = [];
  *
  * results$.subscribe((value) => {
- *   mut_history.push(value);
+ *   valueHistory.push(value);
  * });
  *
  * searchQuery$.next('a');
@@ -64,7 +64,7 @@ import {
  *   setTimeout(resolve, 200);
  * });
  *
- * assert.deepStrictEqual(mut_history, [['abc']]);
+ * assert.deepStrictEqual(valueHistory, [['abc']]);
  * ```
  *
  * @note To improve code readability, consider using `createState` instead of `switchMap`,

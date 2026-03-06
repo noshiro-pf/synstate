@@ -16,7 +16,7 @@ import { type FromPromiseObservable } from '../types/index.mjs';
  * //  Timeline:
  * //
  * //  promise     [pending...]  -> resolved/rejected
- * //  data$                     Ok(value) or Err(error)
+ * //  data$                        Ok(value) or Err(error)
  * //
  * //  Explanation:
  * //  - fromPromise converts a Promise into an observable
@@ -28,13 +28,13 @@ import { type FromPromiseObservable } from '../types/index.mjs';
  *
  * const data$ = fromPromise(fetchData());
  *
- * const mut_history: { value: number }[] = [];
+ * const valueHistory: { value: number }[] = [];
  *
  * await new Promise<void>((resolve) => {
  *   data$.subscribe(
  *     (result) => {
  *       if (Result.isOk(result)) {
- *         mut_history.push(result.value);
+ *         valueHistory.push(result.value);
  *       }
  *     },
  *     () => {
@@ -43,7 +43,7 @@ import { type FromPromiseObservable } from '../types/index.mjs';
  *   );
  * });
  *
- * assert.deepStrictEqual(mut_history, [{ value: 42 }]);
+ * assert.deepStrictEqual(valueHistory, [{ value: 42 }]);
  * ```
  */
 export const fromPromise = <A, E = unknown>(

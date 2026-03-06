@@ -18,27 +18,27 @@ if (import.meta.vitest !== undefined) {
 
     const taken$ = num$.pipe(takeWhile((x) => x < 5));
 
-    const mut_history: number[] = [];
+    const valueHistory: number[] = [];
 
     taken$.subscribe((x) => {
-      mut_history.push(x);
+      valueHistory.push(x);
     });
 
     num$.next(1); // logs: 1
 
-    assert.deepStrictEqual(mut_history, [1]);
+    assert.deepStrictEqual(valueHistory, [1]);
 
     num$.next(2); // logs: 2
 
-    assert.deepStrictEqual(mut_history, [1, 2]);
+    assert.deepStrictEqual(valueHistory, [1, 2]);
 
     num$.next(5); // nothing logged (completes)
 
-    assert.deepStrictEqual(mut_history, [1, 2]);
+    assert.deepStrictEqual(valueHistory, [1, 2]);
 
     num$.next(6); // nothing logged (already completed)
 
-    assert.deepStrictEqual(mut_history, [1, 2]);
+    assert.deepStrictEqual(valueHistory, [1, 2]);
 
     // embed-sample-code-ignore-below
   });

@@ -58,6 +58,12 @@ const checkAll = async (): Promise<void> => {
   });
 
   await logStep({
+    startMessage: 'Running codemod',
+    action: () => runCmdStep('pnpm run codemod:full', 'Codemod failed'),
+    successMessage: 'Codemod applied',
+  });
+
+  await logStep({
     startMessage: 'Formatting code',
     action: () => runCmdStep('pnpm run fmt', 'File formatting failed'),
     successMessage: 'Code formatted',
@@ -66,7 +72,7 @@ const checkAll = async (): Promise<void> => {
   echo('✅ All checks completed successfully!\n');
 };
 
-const step = { current: 1 };
+const mut_step = { current: 1 };
 
 const logStep = async ({
   startMessage,
@@ -77,13 +83,13 @@ const logStep = async ({
   action: () => Promise<void>;
   successMessage: string;
 }>): Promise<void> => {
-  echo(`${step.current}. ${startMessage}...`);
+  echo(`${mut_step.current}. ${startMessage}...`);
 
   await action();
 
   echo(`✓ ${successMessage}.\n`);
 
-  step.current += 1;
+  mut_step.current += 1;
 };
 
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {

@@ -15,12 +15,12 @@ if (import.meta.vitest !== undefined) {
 
     const delayed$ = timer(100);
 
-    const mut_history: number[] = [];
+    const valueHistory: number[] = [];
 
     await new Promise<void>((resolve) => {
       delayed$.subscribe(
         () => {
-          mut_history.push(1);
+          valueHistory.push(1);
         },
         () => {
           resolve();
@@ -28,7 +28,7 @@ if (import.meta.vitest !== undefined) {
       );
     });
 
-    assert.deepStrictEqual(mut_history, [1]);
+    assert.deepStrictEqual(valueHistory, [1]);
 
     // embed-sample-code-ignore-below
   });

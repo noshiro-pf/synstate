@@ -6,25 +6,25 @@ if (import.meta.vitest !== undefined) {
 
     const [state, { setTrue, toggle }] = createBooleanState(false);
 
-    const mut_history: boolean[] = [];
+    const stateHistory: boolean[] = [];
 
     state.subscribe((value: boolean) => {
-      mut_history.push(value);
+      stateHistory.push(value);
     });
 
-    assert.deepStrictEqual(mut_history, [false]);
+    assert.deepStrictEqual(stateHistory, [false]);
 
     setTrue(); // logs: true
 
-    assert.deepStrictEqual(mut_history, [false, true]);
+    assert.deepStrictEqual(stateHistory, [false, true]);
 
     toggle(); // logs: false
 
-    assert.deepStrictEqual(mut_history, [false, true, false]);
+    assert.deepStrictEqual(stateHistory, [false, true, false]);
 
     toggle(); // logs: true
 
-    assert.deepStrictEqual(mut_history, [false, true, false, true]);
+    assert.deepStrictEqual(stateHistory, [false, true, false, true]);
 
     // embed-sample-code-ignore-below
   });

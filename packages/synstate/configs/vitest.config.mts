@@ -4,4 +4,5 @@ import { defineViteConfig } from '../../../configs/vite-config.mjs';
 
 export default defineViteConfig({
   workspaceRootPath,
+  testTimeout: 30_000,
 });

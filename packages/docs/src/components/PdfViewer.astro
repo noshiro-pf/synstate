@@ -1,0 +1,13 @@
+---
+interface Props {
+  src: string;
+  title?: string;
+  height?: string;
+}
+const { src, title = 'PDF Document', height = '800px' } = Astro.props;
+---
+<iframe src={src} title={title} width="100%" height={height}
+  style="border: 1px solid var(--sl-color-gray-5); border-radius: 0.5rem;"
+  loading="lazy">
+  <p>Your browser does not support iframes. <a href={src}>Download the PDF</a>.</p>
+</iframe>

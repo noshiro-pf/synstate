@@ -1,6 +1,6 @@
 import { Optional, expectType } from 'ts-data-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
-import { fromArray } from '../create/index.mjs';
+import { source } from '../create/index.mjs';
 import {
   type MergeObservable,
   type MergeObservableRefined,
@@ -23,7 +23,7 @@ import {
  * ```ts
  * //  Timeline:
  * //
- * //  clicks$   c1          c2                    c3
+ * //  clicks$   c1              c2                c3
  * //  keys$               k1          k2                    k3
  * //  events$   c1        k1    c2    k2          c3        k3
  * //
@@ -38,25 +38,25 @@ import {
  *
  * const events$ = merge([clicks$, keys$]);
  *
- * const mut_history: string[] = [];
+ * const valueHistory: string[] = [];
  *
  * events$.subscribe((event_) => {
- *   mut_history.push(event_);
+ *   valueHistory.push(event_);
  * });
  *
  * clicks$.next('c1');
  *
- * assert.deepStrictEqual(mut_history, ['c1']);
+ * assert.deepStrictEqual(valueHistory, ['c1']);
  *
  * keys$.next('k1');
  *
- * assert.deepStrictEqual(mut_history, ['c1', 'k1']);
+ * assert.deepStrictEqual(valueHistory, ['c1', 'k1']);
  *
  * clicks$.next('c2');
  *
  * keys$.next('k2');
  *
- * assert.deepStrictEqual(mut_history, ['c1', 'k1', 'c2', 'k2']);
+ * assert.deepStrictEqual(valueHistory, ['c1', 'k1', 'c2', 'k2']);
  * ```
  *
  * @note To improve code readability, consider using `createState` instead of `merge`,
@@ -100,9 +100,9 @@ if (import.meta.vitest !== undefined) {
     expect(1).toBe(1); // dummy
   });
 
-  const r1 = fromArray([1, 2, 3]);
+  const r1 = source(1);
 
-  const r2 = fromArray(['a', 'b', 'c']);
+  const r2 = source('a');
 
   const _m = merge([r1, r2] as const);
 

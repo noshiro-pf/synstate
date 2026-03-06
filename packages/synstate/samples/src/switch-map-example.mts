@@ -35,10 +35,10 @@ if (import.meta.vitest !== undefined) {
         }),
       );
 
-      const mut_history: string[][] = [];
+      const valueHistory: string[][] = [];
 
       results$.subscribe((value) => {
-        mut_history.push(value);
+        valueHistory.push(value);
       });
 
       searchQuery$.next('a');
@@ -51,7 +51,7 @@ if (import.meta.vitest !== undefined) {
         setTimeout(resolve, 200);
       });
 
-      assert.deepStrictEqual(mut_history, [['abc']]);
+      assert.deepStrictEqual(valueHistory, [['abc']]);
 
       // embed-sample-code-ignore-below
     },

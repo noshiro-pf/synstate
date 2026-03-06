@@ -6,21 +6,21 @@ if (import.meta.vitest !== undefined) {
 
     const [click$, emitClick] = createEventEmitter();
 
-    const mut_clickCount = { value: 0 };
+    const clickCount = { value: 0 };
 
     click$.subscribe(() => {
-      mut_clickCount.value += 1;
+      clickCount.value += 1;
     });
 
     emitClick(); // logs: Clicked!
 
-    assert.deepStrictEqual(mut_clickCount.value, 1);
+    assert.deepStrictEqual(clickCount.value, 1);
 
     emitClick();
 
     emitClick();
 
-    assert.deepStrictEqual(mut_clickCount.value, 3);
+    assert.deepStrictEqual(clickCount.value, 3);
 
     // embed-sample-code-ignore-below
   });
