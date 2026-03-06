@@ -6,6 +6,7 @@ sidebar:
 
 import { GlitchDemo } from '../../../components/glitch-demo/glitch-demo';
 import { SpringDemo } from '../../../components/spring-demo/spring-demo';
+import { ThroughputDemo } from '../../../components/throughput-demo/throughput-demo';
 
 ## See the Diamond Dependency Glitch in Action
 
@@ -113,6 +114,52 @@ Both SynState and Jotai fire the subscriber **once** per mouse event, making the
 | **SynState** | N           | push (atomic) | **1** (atomic combine)           | O(N)                  |
 | **Jotai**    | N           | pull (lazy)   | **1** (derived read)             | O(N), higher constant |
 | **RxJS**     | N           | push (eager)  | **N+1** (combineLatest glitch)   | O(N²)                 |
+
+---
+
+## Throughput: Per-Update Overhead Under Load
+
+The deep dependency chain demo above shows that SynState and Jotai both fire the subscriber **once** per source update (unlike RxJS). But they are **not equally fast** — SynState's push-based engine has significantly less per-update overhead than Jotai's pull-based engine. This demo makes that constant-factor difference visible.
+
+### How it works
+
+A ball automatically orbits in a circle. Each canvas runs the **same depth-M reactive chain** as the spring demo above. The difference: instead of 1 source update per mouse event, **K source updates are pushed through the chain every animation frame** in a tight synchronous loop.
+
+```
+each animation frame:
+  for k in 0..K-1:
+    update source position (micro-step along orbit)
+    → propagate through depth-M scan chain
+    → subscriber records latest points
+  draw snake once
+```
+
+This amplifies the per-update overhead by a factor of K. When `K × (per-update cost)` exceeds 16ms, the animation drops frames and stutters.
+
+<ThroughputDemo client:only="react" />
+
+### What to look for
+
+- At **low K** (1–100): both libraries animate smoothly
+- **Increase K** toward 500–1000: Jotai's **ms/frame** climbs past 16ms and the animation visibly stutters, while SynState remains smooth
+- The **ms/frame** indicator turns red when it exceeds the 16ms budget (60fps threshold)
+
+### Why Jotai stutters
+
+Each of the K source updates triggers Jotai's full update pipeline:
+
+1. `store.set()` → DFS invalidation of M dependents → O(M)
+2. DFS topological sort to determine recomputation order → O(M)
+3. Recompute each `selectAtom` with epoch checks and dynamic dependency tracking → O(M)
+
+**Total per frame: K × O(M) with high constant factor** (Map/WeakSet allocations, epoch comparisons, two DFS traversals per tick).
+
+SynState's push-based engine propagates through the same chain via **direct function calls** with the propagation order resolved once at subscribe time — no per-update graph traversal, no dynamic dependency tracking, no epoch bookkeeping.
+
+| Library      | Per-update work                                | K=500, M=100 |
+| ------------ | ---------------------------------------------- | ------------ |
+| **SynState** | 100 direct function calls                      | ~2–5ms       |
+| **Jotai**    | 2× DFS(100) + 100 epoch-checked recomputations | ~50–100ms    |
 
 ### Related
 
