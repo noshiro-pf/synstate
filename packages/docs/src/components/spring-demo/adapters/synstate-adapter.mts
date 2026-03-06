@@ -42,9 +42,13 @@ export const createSynStateSpringAdapter = (): SpringAdapter => {
       let mut_prev: Observable<Point> = head;
 
       for (const _ of range(0, chainDepth)) {
-        mut_prev = mut_prev.pipe(springOperator(startPos));
+        const stage: Observable<Point> = mut_prev.pipe(
+          springOperator(startPos),
+        );
 
-        mut_stages.push(mut_prev);
+        mut_stages.push(stage);
+
+        mut_prev = stage;
       }
 
       if (Arr.isArrayOfLength(mut_stages, 0)) {
@@ -66,6 +70,8 @@ export const createSynStateSpringAdapter = (): SpringAdapter => {
       mut_subscription?.unsubscribe();
 
       mut_subscription = undefined;
+
+      mut_mousePos?.complete();
 
       mut_mousePos = undefined;
     },
