@@ -10,7 +10,7 @@ import { collectToArray, combine, counter, map, take } from 'synstate';
     );
     // 0, 1000, 2000, 3000, ...
 
-    const sum = combine([multipliedCounter, counterObservable]).pipe(
+    const sum = combine([counterObservable, multipliedCounter]).pipe(
       map(([a, b]) => a + b),
     );
     // 0, 1001, 2002, 3003, ...

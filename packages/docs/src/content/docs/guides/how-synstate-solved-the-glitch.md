@@ -17,16 +17,16 @@ counterObservable (source)
     ├──────────────────────────┐
     │                          │
     ▼                          ▼
-multipliedCounter          counterObservable
- (= counter × 1000)           (passed through)
+counterObservable          multipliedCounter
+ (passed through)           (= counter × 1000)
     │                          │
     └───────────┬──────────────┘
                 ▼
-          combine([multipliedCounter, counterObservable])
+          combine([counterObservable, multipliedCounter])
                 │
                 ▼
               sum
-         (= multiplied + counter)
+         (= counter + multiplied)
 ```
 
 In code:
@@ -40,7 +40,7 @@ const counterObservable = counter(1000 /* ms */);
 const multipliedCounter = counterObservable.pipe(map((count) => count * 1000));
 // 0, 1000, 2000, 3000, ...
 
-const sum = combine([multipliedCounter, counterObservable]).pipe(
+const sum = combine([counterObservable, multipliedCounter]).pipe(
     map(([a, b]) => a + b),
 );
 // 0, 1001, 2002, 3003, ...
@@ -54,36 +54,36 @@ const result = await resultPromise;
 assert.deepStrictEqual(result, [0, 1001, 2002, 3003, 4004]);
 ```
 
-Both `multipliedCounter` and the second input to `combine` originate from the same source (`counterObservable`). Whenever `counterObservable` emits a new value, both inputs to `combine` should update **together** — and `sum` should always equal `counter * 1001`.
+Both `counterObservable` and `multipliedCounter` (the two inputs to `combine`) originate from the same source (`counterObservable`). Whenever `counterObservable` emits a new value, both inputs to `combine` should update **together** — and `sum` should always equal `counter * 1001`.
 
 ## What Happens in RxJS (Glitch)
 
-In RxJS, `combineLatest` propagates a new value **as soon as any one input changes**. When `counterObservable` emits a new value, the update propagates through the graph in a depth-first manner. Since `multipliedCounter` subscribes to `counterObservable` before `combineLatest` does, the typical sequence when the counter changes from `0` to `1` is:
+In RxJS, `combineLatest` propagates a new value **as soon as any one input changes**. When `counterObservable` emits a new value, the update propagates through the graph in a depth-first manner. Since `combineLatest` subscribes to `counterObservable` (its first input) before `multipliedCounter` (its second input), the typical sequence when the counter changes from `0` to `1` is:
 
 1. `counterObservable` emits `1`
-2. `multipliedCounter` (which subscribes to `counterObservable`) recalculates to `1000`
-3. `combineLatest` sees that `multipliedCounter` (its first input) changed to `1000`, but its second input (`counterObservable`) is still `0` (the old value)
-4. `combineLatest` emits `[1000, 0]` → `sum` emits **`1000`** — a **glitch**
-5. `combineLatest`'s own subscription to `counterObservable` fires with `1`
-6. `combineLatest` emits `[1000, 1]` → `sum` emits `1001` — correct
+2. `combineLatest`'s subscription to `counterObservable` (first input) fires with `1`, but `multipliedCounter` (second input) is still `0` (the old value)
+3. `combineLatest` emits `[1, 0]` → `sum` emits **`1`** — a **glitch**
+4. `multipliedCounter` (which also subscribes to `counterObservable`) recalculates to `1000`
+5. `combineLatest` sees that `multipliedCounter` changed to `1000`
+6. `combineLatest` emits `[1, 1000]` → `sum` emits `1001` — correct
 
 This pattern repeats every time the counter increments:
 
 ```txt
-counter:     0     1             2             3
-             │     │             │             │
-sum (RxJS):  0     1000, 1001   2001, 2002   3002, 3003   ...
-                   ↑             ↑             ↑
-                   glitch        glitch        glitch
+counter:     0     1          2             3
+             │     │          │             │
+sum (RxJS):  0     1, 1001   1002, 2002   2003, 3003   ...
+                   ↑          ↑             ↑
+                   glitch     glitch        glitch
 ```
 
 The full output sequence of `sum` in RxJS is:
 
 ```txt
-0, 1000, 1001, 2001, 2002, 3002, 3003, ...
+0, 1, 1001, 1002, 2002, 2003, 3003, ...
 ```
 
-The values `1000`, `2001`, `3002`, ... are **glitches** — they represent states where `multipliedCounter` has already updated but `counterObservable` has not yet propagated to `combineLatest`. These values should never exist logically (`sum` should always be a multiple of `1001`), yet they are emitted to subscribers, potentially causing incorrect UI rendering, invalid API calls, or subtle bugs.
+The values `1`, `1002`, `2003`, ... are **glitches** — they represent states where `counterObservable` has already updated in `combineLatest` but `multipliedCounter` has not yet recalculated. These values should never exist logically (`sum` should always be a multiple of `1001`), yet they are emitted to subscribers, potentially causing incorrect UI rendering, invalid API calls, or subtle bugs.
 
 You can verify this behavior by running the RxJS sample code in [`01-simple-glitch-example.rxjs.mts`](https://github.com/noshiro-pf/synstate/blob/main/packages/docs/samples/how-synstate-solved-the-glitch/01-simple-glitch-example.rxjs.mts).
 
@@ -103,26 +103,26 @@ const counterObservable = interval(100);
 const multipliedCounter = counterObservable.pipe(map((count) => count * 1000));
 // 0, 1000, 2000, 3000, ...
 
-const sum = combineLatest([multipliedCounter, counterObservable]).pipe(
+const sum = combineLatest([counterObservable, multipliedCounter]).pipe(
     map(([a, b]) => a + b),
 );
-// 0, 1000, 1001, 2001, 2002, 3002, 3003, ...
+// 0, 1, 1001, 1002, 2002, 2003, 3003, ...
 
 const result = await lastValueFrom(sum.pipe(take(7), toArray()));
 
-assert.deepStrictEqual(result, [0, 1000, 1001, 2001, 2002, 3002, 3003]);
+assert.deepStrictEqual(result, [0, 1, 1001, 1002, 2002, 2003, 3003]);
 ```
 
 ### Timeline
 
-| Step | `counterObservable` | `multipliedCounter` | `sum` (`multiplied + counter`) | Consistent? |
+| Step | `counterObservable` | `multipliedCounter` | `sum` (`counter + multiplied`) | Consistent? |
 | ---: | ------------------: | ------------------: | -----------------------------: | :---------: |
 |    1 |                   0 |                   0 |                        **0** ✓ |     Yes     |
-|    2 |                   1 |                1000 |                     **1000** ✗ |   Glitch    |
+|    2 |                   1 |                   0 |                        **1** ✗ |   Glitch    |
 |    3 |                   1 |                1000 |                     **1001** ✓ |     Yes     |
-|    4 |                   2 |                2000 |                     **2001** ✗ |   Glitch    |
+|    4 |                   2 |                1000 |                     **1002** ✗ |   Glitch    |
 |    5 |                   2 |                2000 |                     **2002** ✓ |     Yes     |
-|    6 |                   3 |                3000 |                     **3002** ✗ |   Glitch    |
+|    6 |                   3 |                2000 |                     **2003** ✗ |   Glitch    |
 |    7 |                   3 |                3000 |                     **3003** ✓ |     Yes     |
 
 ### Diagram
@@ -527,7 +527,7 @@ No intermediate states. No glitches. Every value emitted to subscribers is consi
 
 ### Timeline
 
-| Step | `counterObservable` | `multipliedCounter` | `sum` (`multiplied + counter`) | Consistent? |
+| Step | `counterObservable` | `multipliedCounter` | `sum` (`counter + multiplied`) | Consistent? |
 | ---: | ------------------: | ------------------: | -----------------------------: | :---------: |
 |    1 |                   0 |                   0 |                        **0** ✓ |     Yes     |
 |    2 |                   1 |                1000 |                     **1001** ✓ |     Yes     |
@@ -536,18 +536,18 @@ No intermediate states. No glitches. Every value emitted to subscribers is consi
 
 ## Summary
 
-| Library  | Approach                        | Diamond Dependency | Glitch-Free? | Output                                  |
-| :------- | :------------------------------ | :----------------: | :----------: | :-------------------------------------- |
-| RxJS     | Push-based Observable (eager)   |    Yes (native)    |      No      | `0, 1000, 1001, 2001, 2002, 3002, 3003` |
-| MobX     | Pull-based computed (lazy)      |    Yes (native)    |     Yes      | `0, 1001, 2002, 3003, 4004`             |
-| Jotai    | Pull-based derived atom (lazy)  |    Yes (native)    |     Yes      | `0, 1001, 2002, 3003, 4004`             |
-| Redux    | Single store + selectors        |      N/A [^1]      |     Yes      | `0, 1001, 2002, 3003, 4004`             |
-| Zustand  | Single store + selectors        |      N/A [^1]      |     Yes      | `0, 1001, 2002, 3003, 4004`             |
-| SynState | Push-based Observable (ordered) |    Yes (native)    |     Yes      | `0, 1001, 2002, 3003, 4004`             |
+| Library  | Approach                        | Diamond Dependency | Glitch-Free? | Output                               |
+| :------- | :------------------------------ | :----------------: | :----------: | :----------------------------------- |
+| RxJS     | Push-based Observable (eager)   |    Yes (native)    |      No      | `0, 1, 1001, 1002, 2002, 2003, 3003` |
+| MobX     | Pull-based computed (lazy)      |    Yes (native)    |     Yes      | `0, 1001, 2002, 3003, 4004`          |
+| Jotai    | Pull-based derived atom (lazy)  |    Yes (native)    |     Yes      | `0, 1001, 2002, 3003, 4004`          |
+| Redux    | Single store + selectors        |      N/A [^1]      |     Yes      | `0, 1001, 2002, 3003, 4004`          |
+| Zustand  | Single store + selectors        |      N/A [^1]      |     Yes      | `0, 1001, 2002, 3003, 4004`          |
+| SynState | Push-based Observable (ordered) |    Yes (native)    |     Yes      | `0, 1001, 2002, 3003, 4004`          |
 
 [^1]: Redux and Zustand use a single immutable state tree with selector functions. Since all selectors read from the same state snapshot, diamond dependencies do not arise in the first place.
 
-- **RxJS** is the only library that exhibits glitches in this scenario. Its push-based, eager propagation model notifies `combineLatest` as soon as any input changes, without waiting for other inputs sharing the same source to update.
+- **RxJS** is the only library that exhibits glitches in this scenario. Its push-based, eager propagation model notifies `combineLatest` as soon as any input changes, without waiting for other inputs sharing the same source to update. The glitch values (`1`, `1002`, `2003`, ...) represent states where `counterObservable` has already updated but `multipliedCounter` has not yet recalculated.
 - **MobX** and **Jotai** avoid glitches through lazy (pull-based) evaluation of derived values. When a subscriber reads a derived value, all upstream dependencies are recomputed on demand.
 - **Redux** and **Zustand** avoid glitches structurally — their single-store model means all selectors always read from a consistent state snapshot. However, they cannot natively express reactive stream operations like `debounce` or `switchMap`.
 - **SynState** is unique in being both push-based (like RxJS) and glitch-free. It achieves this by ordering the propagation so that all inputs to a combinator are updated before the combinator itself evaluates.

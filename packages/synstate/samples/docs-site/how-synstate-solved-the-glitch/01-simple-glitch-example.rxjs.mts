@@ -17,28 +17,28 @@ import {
     );
     // 0, 1000, 2000, 3000, ...
 
-    const sum = combineLatest([multipliedCounter, counterObservable]).pipe(
+    const sum = combineLatest([counterObservable, multipliedCounter]).pipe(
       map(([a, b]) => a + b),
     );
-    // 0, 1000, 1001, 2001, 2002, 3002, 3003, ...
+    // 0, 1, 1001, 1002, 2002, 2003, 3003, ...
 
     const result = await lastValueFrom(sum.pipe(take(7), toArray()));
 
-    assert.deepStrictEqual(result, [0, 1000, 1001, 2001, 2002, 3002, 3003]);
+    assert.deepStrictEqual(result, [0, 1, 1001, 1002, 2002, 2003, 3003]);
 
     // embed-sample-code-ignore-below
 
     // In RxJS, when counterObservable emits a new value,
-    // multipliedCounter (which subscribes to counterObservable) updates first,
-    // but combineLatest still holds the old counterObservable value at that point.
+    // combineLatest (which subscribes to counterObservable first) updates
+    // the counter slot before multipliedCounter has recalculated.
     // This causes glitches — inconsistent intermediate states:
     //
     //   counter: 0 → multiplied: 0,    sum: 0+0 = 0       ✓
-    //   counter: 1 → multiplied: 1000, sum: 1000+0 = 1000 ✗ glitch (counter still 0)
-    //                                  sum: 1000+1 = 1001 ✓
-    //   counter: 2 → multiplied: 2000, sum: 2000+1 = 2001 ✗ glitch (counter still 1)
-    //                                  sum: 2000+2 = 2002 ✓
-    //   counter: 3 → multiplied: 3000, sum: 3000+2 = 3002 ✗ glitch (counter still 2)
-    //                                  sum: 3000+3 = 3003 ✓
+    //   counter: 1 → counter updates,  sum: 1+0 = 1       ✗ glitch (multiplied still 0)
+    //                multiplied: 1000, sum: 1+1000 = 1001 ✓
+    //   counter: 2 → counter updates,  sum: 2+1000 = 1002 ✗ glitch (multiplied still 1000)
+    //                multiplied: 2000, sum: 2+2000 = 2002 ✓
+    //   counter: 3 → counter updates,  sum: 3+2000 = 2003 ✗ glitch (multiplied still 2000)
+    //                multiplied: 3000, sum: 3+3000 = 3003 ✓
   });
 }
