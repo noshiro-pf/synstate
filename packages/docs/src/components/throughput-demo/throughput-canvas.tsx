@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Arr, asSafeUint, range } from 'ts-data-forge';
-import { type Point, type SpringAdapter } from '../spring-demo/types.mjs';
+import { type Point, type SpringAdapter } from '../spring-demo/index.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from './adapters/index.mjs';
 
 type Stats = Readonly<{
@@ -129,7 +129,7 @@ export const ThroughputCanvas: React.FC<Props> = ({
 
     let mut_rafId = 0;
 
-    const state = adapterStateRef.current;
+    const mut_state = adapterStateRef.current;
 
     const cx = CANVAS_WIDTH / 2;
 
@@ -146,13 +146,13 @@ export const ThroughputCanvas: React.FC<Props> = ({
         return;
       }
 
-      const prevAngle = state.angle;
+      const prevAngle = mut_state.angle;
 
       const t0 = performance.now();
 
       // Run K ticks per frame — this is the hot loop that amplifies
       // per-update overhead differences between libraries
-      for (const mut_k of range(0, ticksPerFrame)) {
+      for (const mut_k of range(asSafeUint(0), asSafeUint(ticksPerFrame))) {
         // eslint-disable-next-line total-functions/no-partial-division
         const angle = prevAngle + (mut_k / ticksPerFrame) * ORBIT_SPEED;
 
@@ -164,16 +164,16 @@ export const ThroughputCanvas: React.FC<Props> = ({
 
       const elapsed = performance.now() - t0;
 
-      state.angle += ORBIT_SPEED;
+      mut_state.angle += ORBIT_SPEED;
 
-      state.totalTicks += ticksPerFrame;
+      mut_state.totalTicks += ticksPerFrame;
 
       // Single draw per frame (onEmit only records points, doesn't draw)
-      drawSnake(mut_ctx, state.lastPoints);
+      drawSnake(mut_ctx, mut_state.lastPoints);
 
       setStats({
         msPerFrame: elapsed,
-        totalTicks: state.totalTicks,
+        totalTicks: mut_state.totalTicks,
       });
 
       mut_rafId = requestAnimationFrame(tick);

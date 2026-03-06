@@ -11,7 +11,7 @@ import {
   type Point,
   type SpringAdapter,
   type Subscription,
-} from '../../spring-demo/types.mjs';
+} from '../../spring-demo/index.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, SPRING_FACTOR, lerp } from './shared.mjs';
 
 const springOperator = (

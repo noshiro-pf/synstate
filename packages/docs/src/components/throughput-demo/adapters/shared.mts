@@ -4,8 +4,4 @@
 // At K=500: (1-0.003)^500 ≈ 0.22 → 78% convergence per frame
 export const SPRING_FACTOR = 0.003;
 
-export {
-  CANVAS_HEIGHT,
-  CANVAS_WIDTH,
-  lerp,
-} from '../../spring-demo/adapters/shared.mjs';
+export { CANVAS_HEIGHT, CANVAS_WIDTH, lerp } from '../../spring-demo/index.mjs';
