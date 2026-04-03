@@ -1,0 +1,32 @@
+---
+import Default from '@astrojs/starlight/components/Head.astro';
+
+const route = Astro.locals.starlightRoute;
+
+// Derive OG image slug from the page URL pathname.
+// e.g. /synstate/ja/guides/why-synstate/ → ja/guides/why-synstate
+//      /synstate/ → index
+//      /synstate/ja/ → ja
+const basePath = '/synstate/';
+const pathname = Astro.url.pathname;
+const slug = pathname.startsWith(basePath)
+  ? pathname.slice(basePath.length).replace(/\/$/, '')
+  : pathname.replace(/^\//, '').replace(/\/$/, '');
+const ogSlug = slug || 'index';
+const ogImageUrl = new URL(`${basePath}og/${ogSlug}.png`, Astro.site);
+---
+
+<Default><slot /></Default>
+<meta property="og:image" content={ogImageUrl.href} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/png" />
+<meta
+  property="og:image:alt"
+  content={`${route.entry.data.title} — SynState`}
+/>
+<meta name="twitter:image" content={ogImageUrl.href} />
+<meta
+  name="twitter:image:alt"
+  content={`${route.entry.data.title} — SynState`}
+/>
