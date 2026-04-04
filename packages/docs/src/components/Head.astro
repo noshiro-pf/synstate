@@ -3,17 +3,14 @@ import Default from '@astrojs/starlight/components/Head.astro';
 
 const route = Astro.locals.starlightRoute;
 
-// Derive OG image slug from the page URL pathname.
-// e.g. /synstate/ja/guides/why-synstate/ → ja/guides/why-synstate
-//      /synstate/ → index
-//      /synstate/ja/ → ja
-const basePath = '/synstate/';
-const pathname = Astro.url.pathname;
-const slug = pathname.startsWith(basePath)
-  ? pathname.slice(basePath.length).replace(/\/$/, '')
-  : pathname.replace(/^\//, '').replace(/\/$/, '');
-const ogSlug = slug || 'index';
-const ogImageUrl = new URL(`${basePath}og/${ogSlug}.png`, Astro.site);
+// Derive OG image slug from the content collection entry ID.
+// This ensures the slug matches exactly what getStaticPaths generates
+// in src/pages/og/[...slug].png.mts (which also uses entry.id).
+// e.g. entry.id = "ja/guides/why-synstate" → /synstate/og/ja/guides/why-synstate.png
+//      entry.id = "index"                  → /synstate/og/index.png
+//      entry.id = "ja/index"               → /synstate/og/ja/index.png
+const ogSlug = route.entry.id;
+const ogImageUrl = new URL(`${import.meta.env.BASE_URL}og/${ogSlug}.png`, Astro.site);
 
 const imageAlt = route.entry.data.description ?? `${route.entry.data.title} — SynState`;
 ---
