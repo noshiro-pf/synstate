@@ -51,8 +51,8 @@ importers:
         specifier: 4.9.6
         version: 4.9.6(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)(vitest@4.1.5)
       github-settings-as-code:
-        specifier: 1.2.6
-        version: 1.2.6(typescript@5.9.3)
+        specifier: 1.2.7
+        version: 1.2.7(typescript@5.9.3)
       jiti:
         specifier: 2.6.1
         version: 2.6.1
@@ -3404,9 +3404,9 @@ packages:
   git-hooks-list@4.2.1:
     resolution: {integrity: sha512-WNvqJjOxxs/8ZP9+DWdwWJ7cDsd60NHf39XnD82pDVrKO5q7xfPqpkK6hwEAmBa/ZSEE4IOoR75EzbbIuwGlMw==}
 
-  github-settings-as-code@1.2.6:
-    resolution: {integrity: sha512-WNzU3fU5MZmzNPxEeWM5vm7eEfSvZxCIGmSD+PZ3KicOfXOT7GkpTYCegS9sA0ETBaFGPnkKmgSvGGrhyBnC0A==}
-    engines: {node: '>=22.12.0', pnpm: '>=9.0.0'}
+  github-settings-as-code@1.2.7:
+    resolution: {integrity: sha512-5LGEsg1CjHg6iTuqNEna7U8SxOTunU1D3Hnwk5GF3Wr6/AHrseasD9RtBe2ZR83mLxv8VfhtdffD/LY018bqXA==}
+    engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
     hasBin: true
 
   github-slugger@2.0.0:
@@ -4382,9 +4382,9 @@ packages:
   obug@2.1.1:
     resolution: {integrity: sha512-uTqF9MuPraAQ+IsnPf366RG4cP9RtUi7MLO1N3KEc+wb0a6yKpeL0lmk2IB1jY5KHPAlTc6T/JRdC/YqxHNwkQ==}
 
-  octokit-safe-types@1.2.15:
-    resolution: {integrity: sha512-gU9ugNkbeSgnSZ3OslsKmtGYc08FvRdQYBX9gl6zurEUiF1T26x3X/6H1cUCLP2ZQkffXXnyUeDX52l2YXR8cA==}
-    engines: {node: '>=22.12.0', pnpm: '>=9.0.0'}
+  octokit-safe-types@1.2.16:
+    resolution: {integrity: sha512-dZGtbIZkJKbjd09R5hkVnxikfVPPUNkTwoPOU5ziLMctKEU6+G+R5bo0u3pJ62SbmXczvpL3WuFOjULUav8k0A==}
+    engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
 
   ofetch@1.5.1:
     resolution: {integrity: sha512-2W4oUZlVaqAPAil6FUg/difl6YhqhUR7x2eZY4bQCko22UXg3hptq9KLQdqFClV+Wu85UX7hNtdGTngi/1BxcA==}
@@ -9086,11 +9086,11 @@ snapshots:
 
   git-hooks-list@4.2.1: {}
 
-  github-settings-as-code@1.2.6(typescript@5.9.3):
+  github-settings-as-code@1.2.7(typescript@5.9.3):
     dependencies:
       '@octokit/core': 7.0.6
       dotenv: 17.4.2
-      octokit-safe-types: 1.2.15(typescript@5.9.3)
+      octokit-safe-types: 1.2.16(typescript@5.9.3)
       ts-data-forge: 6.9.2(typescript@5.9.3)
       ts-fortress: 7.0.3(typescript@5.9.3)
     transitivePeerDependencies:
@@ -10461,7 +10461,7 @@ snapshots:
 
   obug@2.1.1: {}
 
-  octokit-safe-types@1.2.15(typescript@5.9.3):
+  octokit-safe-types@1.2.16(typescript@5.9.3):
     dependencies:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
