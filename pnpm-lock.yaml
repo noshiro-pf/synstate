@@ -208,8 +208,8 @@ importers:
   packages/synstate:
     dependencies:
       ts-data-forge:
-        specifier: ^6.9.1
-        version: 6.9.1(typescript@5.9.3)
+        specifier: ^6.9.2
+        version: 6.9.2(typescript@5.9.3)
     devDependencies:
       '@reduxjs/toolkit':
         specifier: ^2.11.2
@@ -248,8 +248,8 @@ importers:
         specifier: workspace:*
         version: link:../synstate
       ts-data-forge:
-        specifier: ^6.9.1
-        version: 6.9.1(typescript@5.9.3)
+        specifier: ^6.9.2
+        version: 6.9.2(typescript@5.9.3)
     devDependencies:
       '@types/argparse':
         specifier: ^2.0.17
@@ -267,8 +267,8 @@ importers:
         specifier: workspace:*
         version: link:../synstate
       ts-data-forge:
-        specifier: ^6.9.1
-        version: 6.9.1(typescript@5.9.3)
+        specifier: ^6.9.2
+        version: 6.9.2(typescript@5.9.3)
     devDependencies:
       '@preact/signals':
         specifier: ^2.9.0
@@ -289,8 +289,8 @@ importers:
         specifier: workspace:*
         version: link:../synstate
       ts-data-forge:
-        specifier: ^6.9.1
-        version: 6.9.1(typescript@5.9.3)
+        specifier: ^6.9.2
+        version: 6.9.2(typescript@5.9.3)
     devDependencies:
       '@types/argparse':
         specifier: ^2.0.17
@@ -311,8 +311,8 @@ importers:
         specifier: workspace:*
         version: link:../synstate
       ts-data-forge:
-        specifier: ^6.9.1
-        version: 6.9.1(typescript@5.9.3)
+        specifier: ^6.9.2
+        version: 6.9.2(typescript@5.9.3)
     devDependencies:
       '@types/argparse':
         specifier: ^2.0.17
@@ -5121,12 +5121,6 @@ packages:
   ts-data-forge@6.9.0:
     resolution: {integrity: sha512-/J13CeSsWetXroAGsesvQRJxjS11NEe3Qje4bxCb7MTzVMYZfrN4GeQe6jvz/PpD+XmZasG393i6virl4B4cCw==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
-    peerDependencies:
-      typescript: '>=4.8'
-
-  ts-data-forge@6.9.1:
-    resolution: {integrity: sha512-oMXO6nsrabKUKsIeP6aOlKYwkmHMukUuwZn+EQklEqtHoY6HiFsac9Fo/gzr2q2RXZ7O1lje/yKfeXDCsGVWLA==}
-    engines: {node: '>=22.12.0', pnpm: '>=9.0.0'}
     peerDependencies:
       typescript: '>=4.8'
 
@@ -11389,12 +11383,6 @@ snapshots:
   ts-data-forge@6.9.0(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 7.2.0
-      ts-type-forge: 2.4.1
-      typescript: 5.9.3
-
-  ts-data-forge@6.9.1(typescript@5.9.3):
-    dependencies:
-      '@sindresorhus/is': 8.0.0
       ts-type-forge: 2.4.1
       typescript: 5.9.3
 
