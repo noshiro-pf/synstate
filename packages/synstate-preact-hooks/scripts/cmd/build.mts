@@ -54,7 +54,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
         [
           'rollup',
           `--config ${rollupConfig}`,
-          '--configPlugin typescript',
+          `--configPlugin 'typescript={compilerOptions:{module:"esnext",moduleResolution:"bundler"}}'`,
           '--configImportAttributesKey with',
         ].join(' '),
         'Rollup build failed',
