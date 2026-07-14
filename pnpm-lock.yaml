@@ -93,8 +93,8 @@ importers:
         specifier: 10.1.2
         version: 10.1.2(prettier@3.8.4)(typescript@6.0.3)
       ts-type-forge:
-        specifier: 3.1.0
-        version: 3.1.0
+        specifier: 4.0.0
+        version: 4.0.0
       tsx:
         specifier: 4.22.4
         version: 4.22.4
@@ -215,10 +215,10 @@ importers:
     dependencies:
       ts-data-forge:
         specifier: ^6.10.0
-        version: 6.10.0(typescript@7.0.1-rc)
+        version: 6.10.0(typescript@6.0.3)
       ts-type-forge:
-        specifier: ^3.1.0
-        version: 3.1.0
+        specifier: ^4.0.0
+        version: 4.0.0
     devDependencies:
       '@reduxjs/toolkit':
         specifier: 2.12.0
@@ -258,10 +258,10 @@ importers:
         version: link:../synstate
       ts-data-forge:
         specifier: ^6.10.0
-        version: 6.10.0(typescript@7.0.1-rc)
+        version: 6.10.0(typescript@6.0.3)
       ts-type-forge:
-        specifier: ^3.1.0
-        version: 3.1.0
+        specifier: ^4.0.0
+        version: 4.0.0
     devDependencies:
       '@types/argparse':
         specifier: 2.0.17
@@ -280,10 +280,10 @@ importers:
         version: link:../synstate
       ts-data-forge:
         specifier: ^6.10.0
-        version: 6.10.0(typescript@7.0.1-rc)
+        version: 6.10.0(typescript@6.0.3)
       ts-type-forge:
-        specifier: ^3.1.0
-        version: 3.1.0
+        specifier: ^4.0.0
+        version: 4.0.0
     devDependencies:
       '@preact/signals':
         specifier: 2.9.1
@@ -305,10 +305,10 @@ importers:
         version: link:../synstate
       ts-data-forge:
         specifier: ^6.10.0
-        version: 6.10.0(typescript@7.0.1-rc)
+        version: 6.10.0(typescript@6.0.3)
       ts-type-forge:
-        specifier: ^3.1.0
-        version: 3.1.0
+        specifier: ^4.0.0
+        version: 4.0.0
     devDependencies:
       '@types/argparse':
         specifier: 2.0.17
@@ -330,10 +330,10 @@ importers:
         version: link:../synstate
       ts-data-forge:
         specifier: ^6.10.0
-        version: 6.10.0(typescript@7.0.1-rc)
+        version: 6.10.0(typescript@6.0.3)
       ts-type-forge:
-        specifier: ^3.1.0
-        version: 3.1.0
+        specifier: ^4.0.0
+        version: 4.0.0
     devDependencies:
       '@types/argparse':
         specifier: 2.0.17
@@ -5508,6 +5508,10 @@ packages:
   ts-type-forge@3.1.0:
     resolution: {integrity: sha512-TYY+m+TfdoHVnzHXWnwKnxzVKb5iiRacWLW9pxkPMMR1ypxf/1BzUkRvmiCoSxm9hEYscPoUnuRmv7Wb1ddZfQ==}
     engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
+
+  ts-type-forge@4.0.0:
+    resolution: {integrity: sha512-7O9BFH3cxfmr5HR7UUcQ8DiDC/zr6TS1aYfbe8ziyLU3MkXeeE4fs28i6L7ZddnlTQkg1ZOTa9IikJ2aHtg1mQ==}
+    engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
 
   tslib@1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
@@ -12020,12 +12024,6 @@ snapshots:
       ts-type-forge: 3.1.0
       typescript: 6.0.3
 
-  ts-data-forge@6.10.0(typescript@7.0.1-rc):
-    dependencies:
-      '@sindresorhus/is': 8.1.0
-      ts-type-forge: 3.1.0
-      typescript: 7.0.1-rc
-
   ts-declaration-location@1.0.7(typescript@6.0.3):
     dependencies:
       picomatch: 4.0.5
@@ -12061,6 +12059,8 @@ snapshots:
       - typescript
 
   ts-type-forge@3.1.0: {}
+
+  ts-type-forge@4.0.0: {}
 
   tslib@1.14.1: {}
 
