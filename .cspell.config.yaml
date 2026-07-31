@@ -6,24 +6,77 @@ ignoreRandomStrings: true
 words:
   - amannn
   - astrojs
+  - congr
+  - foldl
+  - hany
+  - hapre
+  - hbpre
+  - hchild
+  - hcons
+  - hcpre
+  - hdepth
+  - hfinal
+  - hfrozen
+  - hgen
+  - hipost
+  - hipre
+  - hival
+  - hlhs
+  - hlog
+  - hmem
+  - hmin
+  - hnodup
+  - hnone
+  - hparent
+  - hpfrozen
+  - hppost
+  - hprelog
+  - hpupd
+  - hqav
+  - hqbv
+  - hqueues
+  - hrec
+  - hred
+  - hrnot
+  - hroots
+  - hsize
+  - hsome
+  - hsort
+  - hsrc
+  - hstep
+  - hsub
+  - hval
+  - hwave
+  - hwval
+  - hzpost
+  - hzpre
+  - irrefl
   - Jotai
   - Katex
   - lerp
   - lerps
   - Maier
   - mobx
+  - mult
   - nargs
+  - Nodup
   - noshiro
+  - notin
   - noto
   - nums
+  - rcases
   - recombinations
   - recomputations
   - reduxjs
+  - Repr
   - resvg
   - scanₘ
   - seti
   - sfnt
+  - simpa
   - stageₙ
+  - succ
+  - symm
   - synstate
   - testw
   - tscw
@@ -31,12 +84,14 @@ words:
   - unsub
   - unsubs
   - valtio
+  - vitest
   - zustand
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml
   - dist/**
   - agents/common/**
+  - packages/docs/willow-paper-summary.md
   - packages/docs/public
   - packages/docs/src/components/data-table-demo/sample-data.mts
   - packages/docs/assets/sample.csv
