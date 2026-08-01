@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@types/argparse": "2.0.17",
-    "argparse": "2.0.1",
+    "argparse": "3.0.0",
     "preact": "10.29.4"
   },
   "peerDependencies": {
