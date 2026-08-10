@@ -1,3 +1,11 @@
+> [!IMPORTANT]
+>
+> **This repository has moved to [noshiro-pf/mono](https://github.com/noshiro-pf/mono).**
+>
+> Development continues at [`libs/synstate`](https://github.com/noshiro-pf/mono/tree/main/libs/synstate), [`libs/synstate-react-hooks`](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-react-hooks), [`libs/synstate-react-hooks-compat`](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-react-hooks-compat), [`libs/synstate-preact-hooks`](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-preact-hooks), [`libs/synstate-preact-signals`](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-preact-signals), [`apps/synstate-docs`](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-docs).
+> The full commit history and every tag came along; releases and issues stay
+> readable here.
+
 # SynState
 
 <p align="center">
