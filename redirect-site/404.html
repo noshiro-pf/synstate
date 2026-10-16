@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>SynState docs have moved</title>
+    <!--
+      The documentation moved to https://noshiro-pf.github.io/mono/synstate/
+      with the same page structure. GitHub Pages serves this file both as
+      the site root and (as 404.html) for every other old URL, so the script
+      maps /synstate/<path> to /mono/synstate/<path>, keeping query and hash.
+      The meta refresh and the link below cover visitors without JavaScript.
+    -->
+    <link rel="canonical" href="https://noshiro-pf.github.io/mono/synstate/" />
+    <meta
+      http-equiv="refresh"
+      content="0; url=https://noshiro-pf.github.io/mono/synstate/"
+    />
+    <script>
+      (function () {
+        var oldBase = '/synstate';
+        var newBase = '/mono/synstate';
+        var path = location.pathname;
+        var rest =
+          path.indexOf(oldBase) === 0 ? path.slice(oldBase.length) : '/';
+        if (rest === '' || rest.charAt(0) !== '/') rest = '/' + rest;
+        if (rest === '/index.html' || rest === '/404.html') rest = '/';
+        var target = newBase + rest + location.search + location.hash;
+        var canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) canonical.href = location.origin + newBase + rest;
+        location.replace(target);
+      })();
+    </script>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 40rem;
+        margin: 4rem auto;
+        padding: 0 1rem;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>SynState docs have moved</h1>
+    <p>
+      The documentation now lives at
+      <a href="https://noshiro-pf.github.io/mono/synstate/"
+        >noshiro-pf.github.io/mono/synstate</a
+      >.
+    </p>
+    <p lang="ja">
+      ドキュメントは
+      <a href="https://noshiro-pf.github.io/mono/synstate/"
+        >noshiro-pf.github.io/mono/synstate</a
+      >
+      に移転しました。
+    </p>
+  </body>
+</html>
